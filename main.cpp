@@ -163,7 +163,6 @@ int main()
     attributes.push_back(a);
     int boxShader = graphics.newShaderResource(boxVertexShaderSource, boxFragmentShaderSource, attributes);
     world->createBoxes(boxShader);
-    std::ofstream file; file.open("example.data", std::ios::out | std::ios::app | std::ios::binary);
 
 	sf::Clock timer;
 
@@ -175,7 +174,6 @@ int main()
 		float elapsedTime = timer.getElapsedTime().asSeconds();
         if (elapsedTime > 0.03f)
             std::cout << elapsedTime << "\n";
-        file << elapsedTime << "\n";
 
 		timer.restart();
 
