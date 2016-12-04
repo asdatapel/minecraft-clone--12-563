@@ -526,8 +526,8 @@ void Chunk::updateBuffer() {
 
 void Chunk::render()
 {
-
-	graphics->renderBuffer(bufferResourceId, meshLength / 11);
+	if (loadingComplete && !meshDirty)
+		graphics->renderBuffer(bufferResourceId, meshLength / 11);
 
 }
 

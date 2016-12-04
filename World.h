@@ -19,7 +19,7 @@
 class World
 {
 public:
-	World(GraphicsManager * graphicsManager, int shaderId);
+	World(GraphicsManager *graphicsManager, int shaderId);
 	~World();
 	Block blocks[5];
 
