@@ -16,6 +16,15 @@ using namespace Const;
 
 class World;
 
+enum ChunkState{
+	OutOfRange = 0,
+	InLoadingQueue,
+	CurrentlyLoading,
+	Loaded,
+	InMeshingQueue,
+	CurrentlyMeshing,
+	Meshed
+};
 
 class Chunk
 {
@@ -27,6 +36,8 @@ public:
 	void genChunk();
 	float * genMesh();
 	float * genNaiveMesh();
+
+	bool isLoaded();
 
 	bool checkCollision(fvec3 pos);
 	bool checkCollision(AABB box);
@@ -44,10 +55,11 @@ public:
 	void updateBuffer();
 	void render();
 
-	bool isCurrentlyLoading;
-	bool isCurrentlyMeshing;
-	bool loadingComplete;
+	ChunkState state;
 	bool meshDirty;
+
+	int meshLength;
+	int tempMeshLength;
 
 	class Comparator {
 	public:
@@ -79,7 +91,6 @@ private:
 
 	void genFace(int side, int x, int z, int y, int arrayTexId, int delta);
 	int vertexOccluders(fvec3 position, float x, float z, float y, int side);
-	int meshLength;
 
 	fvec3 getRelativePosition(fvec3 worldPosition);
 	fvec3 getWorldPosition(fvec3 relativePosition);
@@ -90,9 +101,6 @@ private:
 	void addBlockRelative(fvec3 position, int blockId);
 
 	float nearestBound(float pos, float speed);
-
-
-#pragma region cubemesh
 
 	const float cube[6 * FACE_DATA_LENGTH] = {
 		1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
@@ -180,5 +188,4 @@ private:
 		1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 		1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 	};
-#pragma endregion
 };

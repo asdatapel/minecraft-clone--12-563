@@ -62,8 +62,12 @@ private:
 	std::mutex m;
 	std::condition_variable meshWaiter;
 	std::condition_variable loadWaiter;
-	std::priority_queue<Chunk*, std::vector<Chunk*>, Chunk::Comparator> meshJobs;
-	std::priority_queue<Chunk*, std::vector<Chunk*>, Chunk::Comparator> loadJobs;
+
+	//std::priority_queue<Chunk*, std::vector<Chunk*>, Chunk::Comparator> meshJobs;
+	//std::priority_queue<Chunk*, std::vector<Chunk*>, Chunk::Comparator> loadJobs;
+    ivec2 chunkLoadCenter;
+    std::list<Chunk*> meshJobs;
+    std::list<Chunk*> loadJobs;
     void addCompleteJobToQueue(std::queue<Chunk*> *q, Chunk* job);
     std::queue<Chunk*> finishedMeshJobs;
     std::queue<Chunk*> finishedLoadJobs;

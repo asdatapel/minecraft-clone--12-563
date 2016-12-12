@@ -92,3 +92,13 @@ ivec2 operator + (const ivec2& a, const ivec2& b) {
 fvec3 floor(fvec3 vec) {
 	return { floor(vec.x), floor(vec.z), floor(vec.y) };
 }
+
+fvec3 fvec3::normalize() {
+	float mag = length();
+	return {x / mag, z / mag, y / mag};
+}
+
+float fvec3::length() {
+	return sqrt(x*x + z*z + y*y);
+
+}

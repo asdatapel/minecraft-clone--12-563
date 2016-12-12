@@ -36,8 +36,9 @@ int main()
 	glewInit();
 	//window.setVerticalSyncEnabled(true);
 	window.setMouseCursorVisible(false);
-	glEnable(GL_TEXTURE_2D); glEnable(GL_CULL_FACE); glFrontFace(GL_CW);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glEnable(GL_CULL_FACE); glFrontFace(GL_CW);
+
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glClearColor(7 / 255.0, 56 / 255.0, 145 / 255.0, 1);
 
@@ -89,53 +90,53 @@ int main()
 	graphics.updateBuffer(crosshairBuffer, crosshairMesh, 24);	
 
 	float skyMesh[180] = {
-		1.0f, -1.0f, -1.0f, 0.0, 1.0 /3.0,
-		-1.0f, -1.0f, -1.0f, 1.0 / 4.0, 1.0 /3.0,
-		1.0f, 1.0f, -1.0f, 0.0, 2.0 /3.0,
+            1.0f, -1.0f, -1.0f, 0.0, 1.0 /3.0,
+            -1.0f, -1.0f, -1.0f, 1.0 / 4.0, 1.0 /3.0,
+            1.0f, 1.0f, -1.0f, 0.0, 2.0 /3.0,
 
-		-1.0f, -1.0f, -1.0f, 1.0 / 4.0, 1.0 / 3.0,
-		-1.0f, 1.0f, -1.0f, 1.0 / 4.0, 2.0 / 3.0,
-		1.0f, 1.0f, -1.0f, 0.0, 2.0 / 3.0,
+            -1.0f, -1.0f, -1.0f, 1.0 / 4.0, 1.0 / 3.0,
+            -1.0f, 1.0f, -1.0f, 1.0 / 4.0, 2.0 / 3.0,
+            1.0f, 1.0f, -1.0f, 0.0, 2.0 / 3.0,
 
-		1.0f, -1.0f, 1.0f, 3.0 / 4.0, 1.0 / 3.0,
-		-1.0f, 1.0f, 1.0f, 2.0 / 4.0, 2.0 / 3.0,
-		-1.0f, -1.0f, 1.0f,  2.0 / 4.0, 1.0 / 3.0,
+            1.0f, -1.0f, 1.0f, 3.0 / 4.0, 1.0 / 3.0,
+            -1.0f, 1.0f, 1.0f, 2.0 / 4.0, 2.0 / 3.0,
+            -1.0f, -1.0f, 1.0f, 2.0 / 4.0, 1.0 / 3.0,
 
-		1.0f, -1.0f, 1.0f,  3.0 / 4.0, 1.0 / 3.0,
-		1.0f, 1.0f, 1.0f,  3.0 / 4.0, 2.0 / 3.0,
-		-1.0f, 1.0f, 1.0f,  2.0 / 4.0, 2.0 / 3.0,
+            1.0f, -1.0f, 1.0f, 3.0 / 4.0, 1.0 / 3.0,
+            1.0f, 1.0f, 1.0f, 3.0 / 4.0, 2.0 / 3.0,
+            -1.0f, 1.0f, 1.0f, 2.0 / 4.0, 2.0 / 3.0,
 
-		1.0f, 1.0f, 1.0f,  1.0 / 4.0, 2.0 / 3.0,
-		1.0f, -1.0f, -1.0f,  2.0 / 4.0, 1.0 / 3.0,
-		1.0f, 1.0f, -1.0f,  2.0 / 4.0, 2.0 / 3.0,
+            1.0f, 1.0f, 1.0f,  1.0 / 4.0, 2.0 / 3.0,
+            1.0f, -1.0f, -1.0f,  2.0 / 4.0, 1.0 / 3.0,
+            1.0f, 1.0f, -1.0f,  2.0 / 4.0, 2.0 / 3.0,
 
-		1.0f, 1.0f, 1.0f,  1.0 / 4.0, 2.0 / 3.0,
-		1.0f, -1.0f, 1.0f, 1.0 / 4.0, 1.0 / 3.0,
-		1.0f, -1.0f, -1.0f, 2.0 / 4.0, 1.0 / 3.0,
+            1.0f, 1.0f, 1.0f,  1.0 / 4.0, 2.0 / 3.0,
+            1.0f, -1.0f, 1.0f, 1.0 / 4.0, 1.0 / 3.0,
+            1.0f, -1.0f, -1.0f, (float) (2.0 / 4.0), (float) (1.0 / 3.0),
 
-		-1.0f, -1.0f, -1.0f,  3.0 / 4.0, 1.0 / 3.0,
-		-1.0f, 1.0f, 1.0f,  4.0 / 4.0, 2.0 / 3.0,
-		-1.0f, 1.0f, -1.0f,  3.0 / 4.0, 2.0 / 3.0,
+            -1.0f, -1.0f, -1.0f,  3.0 / 4.0, 1.0 / 3.0,
+            -1.0f, 1.0f, 1.0f,  4.0 / 4.0, 2.0 / 3.0,
+            -1.0f, 1.0f, -1.0f,  3.0 / 4.0, 2.0 / 3.0,
 
-		-1.0f, -1.0f, -1.0f,  3.0 / 4.0, 1.0 / 3.0,
-		-1.0f, -1.0f, 1.0f,  4.0 / 4.0, 1.0 / 3.0,
-		-1.0f, 1.0f, 1.0f,  4.0 / 4.0, 2.0 / 3.0,
+            -1.0f, -1.0f, -1.0f, (float) (3.0 / 4.0), 1.0 / 3.0,
+            -1.0f, -1.0f, 1.0f,  4.0 / 4.0, 1.0 / 3.0,
+            -1.0f, 1.0f, 1.0f,  4.0 / 4.0, 2.0 / 3.0,
 
-		-1.0f, -1.0f, -1.0f,  2.0 / 4.0, 1.0 / 3.0,
-		1.0f, -1.0f, 1.0f,  1.0 / 4.0, 0.0f,
-		-1.0f, -1.0f, 1.0f,  2.0 / 4.0, 0.0f,
+            -1.0f, -1.0f, -1.0f,  2.0 / 4.0, 1.0 / 3.0,
+            1.0f, -1.0f, 1.0f,  1.0 / 4.0, 0.0f,
+            -1.0f, -1.0f, 1.0f,  2.0 / 4.0, 0.0f,
 
-		-1.0f, -1.0f, -1.0f,  2.0 / 4.0, 1.0 / 3.0,
-		1.0f, -1.0f, -1.0f,  1.0 / 4.0, 1.0 / 3.0,
-		1.0f, -1.0f, 1.0f,  1.0 / 4.0, 0.0f,
+            -1.0f, -1.0f, -1.0f, 2.0 / 4.0, 1.0 / 3.0,
+            1.0f, -1.0f, -1.0f, 1.0 / 4.0, 1.0 / 3.0,
+            1.0f, -1.0f, 1.0f, 1.0 / 4.0, 0.0f,
 
-		-1.0f, 1.0f, 1.0f,  1.0 / 4.0, 2.0 / 3.0,
-		1.0f, 1.0f, -1.0f,  2.0 / 4.0, 1.0f,
-		-1.0f, 1.0f, -1.0f,  1.0 / 4.0, 1.0f,
+            -1.0f, 1.0f, 1.0f, 1.0 / 4.0, 2.0 / 3.0,
+            1.0f, 1.0f, -1.0f, 2.0 / 4.0, 1.0f,
+            -1.0f, 1.0f, -1.0f, 1.0 / 4.0, 1.0f,
 
-		-1.0f, 1.0f, 1.0f,  1.0 / 4.0, 2.0 / 3.0,
-		1.0f, 1.0f, 1.0f,  2.0 / 4.0, 2.0 / 3.0,
-		1.0f, 1.0f, -1.0f,  2.0/ 4.0, 1.0f,
+            -1.0f, 1.0f, 1.0f, 1.0 / 4.0, 2.0 / 3.0,
+            1.0f, 1.0f, 1.0f, 2.0 / 4.0, 2.0 / 3.0,
+            1.0f, 1.0f, -1.0f, 2.0/ 4.0, 1.0f,
 	};
 	int skyBuffer = graphics.newBuffer(shaderSky);
 	graphics.updateBuffer(skyBuffer, skyMesh, 180);
@@ -146,7 +147,7 @@ int main()
 	Camera camera; camera.setPosition(player.getCameraPosition());
 	Perlin perlin(6, 4, 1, 51);
 
-
+    graphics.bindShader(shader3d);
 	World * world = new World(&graphics, shader3d);
 	world->genChunks(&perlin);
 
@@ -172,8 +173,6 @@ int main()
 	while (running)
 	{
 		float elapsedTime = timer.getElapsedTime().asSeconds();
-        if (elapsedTime > 0.03f)
-            std::cout << elapsedTime << "\n";
 
 		timer.restart();
 
@@ -224,12 +223,15 @@ int main()
 
 		//velocity *= fvec3(0.9, 0.9, 1.0) ;
 		//velocity += fvec3(0.0, 0.0, -1.5) * elapsedTime;
-		velocity *= fvec3(0.9, 0.9, 0.9);
+        float dampening = std::pow(0.01f, elapsedTime);
+        float dampeningY = std::pow(0.05f, elapsedTime);
+		velocity = {velocity.x * dampening, velocity.z * dampening, velocity.y * dampeningY};
+        //std::cout << dampening << " --- " << velocity.x << ", " << velocity.z << " " << velocity.y << "\n";
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
 			velocity += (camera.getForwardVector() *  -0.25f);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-			velocity += (camera.getForwardVector()*  0.25f);
+			velocity += (camera.getForwardVector() *  0.25f);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
 			velocity += (camera.getRightVector() *  -0.25f);
@@ -244,18 +246,21 @@ int main()
 			velocity += fvec3(0.0, 0.0, 1.5);
 		}
 
-		if (velocity.x > 1.0f)
-			velocity.x = 1.0f;
-		if (velocity.z > 1.0f)
-			velocity.z = 1.0f;
-		if (velocity.y > 2.0f)
-			velocity.y = 2.0f;
-		if (velocity.x < -1.0f)
-			velocity.x = -1.0f;
-		if (velocity.z < -1.0f)
-			velocity.z = -1.0f;
-		if (velocity.y < -2.0f)
-			velocity.y = -2.0f;
+        if (sqrt(velocity.x * velocity.x + velocity.z *velocity.z) < 0.05) {
+            velocity.x = 0;
+            velocity.z = 0;
+        }else if (sqrt(velocity.x * velocity.x + velocity.z *velocity.z) > 1.f){
+            float mag = sqrt(velocity.x * velocity.x + velocity.z *velocity.z);
+            velocity.x = velocity.x / mag;
+            velocity.z = velocity.z  / mag;
+        }
+        if (velocity.y > 1.f){
+            velocity.y = 1.f;
+        }else if (velocity.y < -1.f){
+            velocity.y = -1.f;
+        }
+
+
 
 		player.setVelocity(velocity);
 
@@ -320,10 +325,10 @@ int main()
 		//sunlight = 0.05;
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-			sunlight += 0.0001f;
+			sunlight += 0.0005f;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-			sunlight -= 0.0001f;
+			sunlight -= 0.0005f;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
 			std::cout << sunlight << std::endl;

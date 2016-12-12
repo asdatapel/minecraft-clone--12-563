@@ -13,10 +13,9 @@ Chunk::Chunk(World* worldPointer, Perlin *p, ivec2 coords, Block* blockList, Gra
 	world = worldPointer;
 	perlin = p;
 
-	loadingComplete = false;
+    state = ChunkState::OutOfRange;
 	meshDirty = false;
-	isCurrentlyLoading = false;
-	isCurrentlyMeshing = false;
+
 
 	meshLength = 0;
 }
@@ -227,7 +226,7 @@ float * Chunk::genMesh() {
 		}
 	}
 
-	meshLength = k;
+	tempMeshLength = k;
 
 	return mesh;
 }
@@ -526,7 +525,7 @@ void Chunk::updateBuffer() {
 
 void Chunk::render()
 {
-	if (loadingComplete && !meshDirty)
+	if (state >= ChunkState::Loaded)
 		graphics->renderBuffer(bufferResourceId, meshLength / 11);
 
 }
@@ -584,4 +583,8 @@ void Chunk::setBlockRelative(fvec3 position, int blockId)
 	if (position.x < 0 || position.z < 0 || position.y < 0 || position.x >= CHUNK_SIZE_X || position.z >= CHUNK_SIZE_Z || position.y >= CHUNK_SIZE_Y)
 		return;
 	data[(int)position.x][(int)position.z][(int)position.y].blockId = blockId;
+}
+
+bool Chunk::isLoaded() {
+	return state >= ChunkState::Loaded;
 }

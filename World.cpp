@@ -138,7 +138,7 @@ int World::getBlock(fvec3 position)
 	if (!chunk)
 		return -1;
 
-	if (!chunk->loadingComplete)
+	if (!chunk->isLoaded())
 		return -1;
 	return chunk->getBlock(position);
 }
@@ -203,7 +203,7 @@ unsigned short World::getSunlightLevel(fvec3 position)
 	if (!chunk)
 		return 0;
 
-	if (!chunk->loadingComplete)
+	if (!chunk->isLoaded())
 		return 0;
 
 	return chunk->getSunlightLevel(position);
@@ -254,15 +254,16 @@ void World::update(fvec3 playerPos, float elapsedTime)
 
     std::unique_lock<std::mutex> lock(m);
 
-
     ivec2 centerChunk = getChunkCoords(playerPos);
     for (auto chunk = chunks.begin(); chunk != chunks.end();) {
         ivec2 vec = chunk->first;
-        if (!isChunkInMeshRange(vec, centerChunk)) {
-
-        }
-        else if (!isChunkInLoadRange(vec, centerChunk)) {
-            if (!chunk->second->isCurrentlyLoading) {
+        if (!isChunkInLoadRange(vec, centerChunk)) {
+            if (chunk->second->state == ChunkState::InLoadingQueue){
+                loadJobs.remove(chunk->second);
+            }else if(chunk->second->state == ChunkState::InMeshingQueue){
+                meshJobs.remove(chunk->second);
+            }
+            if (chunk->second->state != ChunkState::CurrentlyLoading && chunk->second->state != ChunkState::CurrentlyMeshing) {
                 delete chunk->second;
                 chunk = chunks.erase(chunk);
                 continue;
@@ -278,20 +279,18 @@ void World::update(fvec3 playerPos, float elapsedTime)
                 if (!chunk) {
                     chunk = new Chunk(this, perlin, ivec2(i, j), blocks, graphics, shader);
                     chunks.insert({ { i,j }, chunk });
-                    chunk->isCurrentlyLoading = true;
+                    chunk->state = ChunkState::InLoadingQueue;
                     chunk->updatePriority = abs(i - centerChunk.x) + abs(j - centerChunk.z);
-                    loadJobs.push(chunk);
+                    loadJobs.push_front(chunk);
 
                     loadWaiter.notify_one();
-                }
-                else if (isChunkInMeshRange({ i,j }, centerChunk)) {
-                    if (chunk->meshDirty && !chunk->isCurrentlyMeshing && chunk->loadingComplete && isChunkNeighborsLoaded({ i,j })) {
-                        chunk->isCurrentlyMeshing = true;
+                } else if (chunk->meshDirty && (chunk->state == ChunkState::Loaded || chunk->state == ChunkState::Meshed)&& isChunkNeighborsLoaded({ i,j })) {
+                        chunk->state = ChunkState::InMeshingQueue;
                         chunk->updatePriority = abs(i - centerChunk.x) + abs(j - centerChunk.z);
-                        meshJobs.push(chunk);
+                        meshJobs.push_front(chunk);
                         meshWaiter.notify_one();
                     }
-                }
+
 
             }
         }
@@ -301,8 +300,7 @@ void World::update(fvec3 playerPos, float elapsedTime)
         Chunk* job = finishedLoadJobs.front();
         finishedLoadJobs.pop();
 
-        job->isCurrentlyLoading = false;
-        job->loadingComplete = true;
+        job->state = ChunkState::Loaded;
         job->meshDirty = true;
     }
 
@@ -310,8 +308,10 @@ void World::update(fvec3 playerPos, float elapsedTime)
         Chunk* job = finishedMeshJobs.front();
         finishedMeshJobs.pop();
 
-        job->isCurrentlyMeshing = false;
+        job->state = ChunkState::Meshed;
         job->meshDirty = false;
+
+        job->meshLength = job->tempMeshLength;
 
         job->updateBuffer();
     }
@@ -356,19 +356,19 @@ bool World::isChunkNeighborsLoaded(ivec2 chunkCoords)
 	Chunk *chunk;
 	chunkCoords += adjecent_chunk[0];
 	chunk = getChunk(chunkCoords);
-	if (!chunk || !chunk->loadingComplete)
+	if (!chunk || !chunk->isLoaded())
 		return false;
 	chunkCoords += adjecent_chunk[1];
 	chunk = getChunk(chunkCoords);
-	if (!chunk || !chunk->loadingComplete)
+	if (!chunk || !chunk->isLoaded())
 		return false;
 	chunkCoords += adjecent_chunk[2];
 	chunk = getChunk(chunkCoords);
-	if (!chunk || !chunk->loadingComplete)
+	if (!chunk || !chunk->isLoaded())
 		return false;
 	chunkCoords += adjecent_chunk[3];
 	chunk = getChunk(chunkCoords);
-	if (!chunk || !chunk->loadingComplete)
+	if (!chunk || !chunk->isLoaded())
 		return false;
 	return true;
 }
@@ -387,7 +387,7 @@ void World::addLight(fvec3 position, int lightLevel)
 		fvec3 newPos;
 		for (int i = 0; i < 6; i++) {
 			newPos = n.position + adjecent[i];
-			if (getBlock(newPos) < 1 && getLightLevel(newPos) < n.lightLevel - 1) {
+			if (getBlock(newPos) == 0 && getLightLevel(newPos) < n.lightLevel - 1) {
 				setLightLevel(newPos, n.lightLevel - 1);
 				lightQueue.push({ newPos, n.lightLevel - 1 });
 			}
@@ -515,8 +515,9 @@ Chunk * World::getNextMeshJob()
 	{
 		if (!meshJobs.empty())
 		{
-			Chunk* job = meshJobs.top();
-			meshJobs.pop();
+			Chunk* job = meshJobs.front();
+			meshJobs.pop_front();
+            job->state = ChunkState::CurrentlyMeshing;
 			return job;
 		}
 
@@ -542,8 +543,9 @@ Chunk * World::getNextLoadJob()
     {
         if (!loadJobs.empty())
         {
-            Chunk* job = loadJobs.top();
-            loadJobs.pop();
+            Chunk* job = loadJobs.front();
+            loadJobs.pop_front();
+            job->state = ChunkState::CurrentlyLoading;
             return job;
         }
 
@@ -603,3 +605,5 @@ void World::createRandomBoxes(int shaderId){
         boxes.push_back(b);
     }
 }
+
+

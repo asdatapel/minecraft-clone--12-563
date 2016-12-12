@@ -10,6 +10,7 @@ public:
 
 	fvec3 getPosition();
 	fvec3 getVelocity();
+	float getHorizontalSpeed();
 	void setPosition(fvec3);
 	void setVelocity(fvec3);
 	void setRotation(float xAngle);

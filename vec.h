@@ -21,6 +21,9 @@ struct fvec3 {
 	float x;
 	float z;
 	float y;
+
+	fvec3 normalize();
+	float length();
 };
 
 bool operator < (const fvec3& a, const fvec3& b);
@@ -52,6 +55,7 @@ ivec2& operator += (ivec2& a, const ivec2& b);
 ivec2 operator + (const ivec2& a, const ivec2& b);
 
 fvec3 floor(fvec3 vec);
+
 
 namespace std
 {

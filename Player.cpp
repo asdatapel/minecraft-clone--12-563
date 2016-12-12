@@ -13,6 +13,10 @@ Player::~Player()
 {
 }
 
+float Player::getHorizontalSpeed() {
+	return sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+}
+
 fvec3 Player::getPosition()
 {
 	return box.getPosition();
