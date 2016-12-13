@@ -280,28 +280,30 @@ float * Chunk::genNaiveMesh() {
 
 
 void Chunk::genFace(int side, int x, int z, int y, int arrayTexId, int delta) {
-	int sideDelta = side * FACE_DATA_LENGTH;
-	const float *blockMesh = cube;
+	const float *sideMesh = cube[side];
 
-	int vertAos[6];
-	for (int vert = 0; vert > 6; vert += 1) {
-		int i = vert * 9;
-		vertAos[vert] = vertexOccluders({ x,z,y }, blockMesh[sideDelta + i], blockMesh[sideDelta + i + 2], blockMesh[sideDelta + i + 1], side);
+	int vertAos[4];
+	for (int vert = 0; vert < 4; ++vert) {
+		int i = vert * 5;
+		vertAos[vert] = vertexOccluders({ x,z,y }, sideMesh[i], sideMesh[i + 2], sideMesh[i + 1], side);
 	}
 
-	if (vertAos[0] + vertAos[2] < vertAos[1] + vertAos[5])
-		blockMesh = cubealt;
+    const int *vert_order;
+	if (vertAos[0] + vertAos[3] < vertAos[1] + vertAos[2])
+		vert_order = faces;
 	else
-		blockMesh = cube;
+		vert_order = alt_faces;
 
 	int i = 0;
 	for (int vert = 0; vert < 6; vert += 1) {
 
-		mesh[delta + i] = blockMesh[sideDelta + i] + x;
-		mesh[delta + i + 1] = blockMesh[sideDelta + i + 1] + y;
-		mesh[delta + i + 2] = blockMesh[sideDelta + i + 2] + z;
+        int vertexDelta = vert_order[vert] * 5;
 
-		int aoLevel = vertexOccluders({ x,z,y }, blockMesh[sideDelta + i], blockMesh[sideDelta + i + 2], blockMesh[sideDelta + i + 1], side);
+		mesh[delta + i] = sideMesh[vertexDelta] + x;
+		mesh[delta + i + 1] = sideMesh[vertexDelta + 1] + y;
+		mesh[delta + i + 2] = sideMesh[vertexDelta + 2] + z;
+
+		int aoLevel = vertAos[vert_order[vert]];
 
 		for (int k = i + 3; k < i + 6; k++) {
 			mesh[delta + k] = getLightLevel(fvec3{ x,z,y } + adjecent[side]) * 0.1f;
@@ -311,12 +313,12 @@ void Chunk::genFace(int side, int x, int z, int y, int arrayTexId, int delta) {
 
 		mesh[delta + i + 7] = aoLevel;
 
-        mesh[delta + i + 8] = blockMesh[sideDelta + i + 6];
-        mesh[delta + i + 9] = blockMesh[sideDelta + i + 7];
+        mesh[delta + i + 8] = sideMesh[vertexDelta + 3];
+        mesh[delta + i + 9] = sideMesh[vertexDelta + 4];
 
 		mesh[delta + i + 10] = arrayTexId;
 
-		i += 11;
+		i += FACE_DATA_LENGTH / 6;
 	}
 
 }

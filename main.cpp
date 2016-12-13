@@ -34,7 +34,7 @@ int main()
 
 	glewExperimental = GL_TRUE;
 	glewInit();
-	//window.setVerticalSyncEnabled(true);
+	window.setVerticalSyncEnabled(true);
 	window.setMouseCursorVisible(false);
     glEnable(GL_CULL_FACE); glFrontFace(GL_CW);
 
@@ -196,8 +196,12 @@ int main()
                     running = false;
                 }else if (event.key.code == sf::Keyboard::M){
                     world->createRandomBoxes(boxShader);
+                }else if (event.key.code == sf::Keyboard::P){
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                 }
-			}
+                }else if (event.key.code == sf::Keyboard::O){
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                }
 			else if (event.type == sf::Event::MouseButtonPressed) {
 				if (event.mouseButton.button == sf::Mouse::Button::Left) {
 					RayCollision ray = world->raycast(camera.getPosition(), camera.getDirectionVector(), 4);
