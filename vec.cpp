@@ -99,6 +99,6 @@ fvec3 fvec3::normalize() {
 }
 
 float fvec3::length() {
-	return sqrt(x*x + z*z + y*y);
+    return sqrt(x*x + z*z + y*y);
 
 }

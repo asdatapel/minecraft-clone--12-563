@@ -16,8 +16,9 @@ Chunk::Chunk(World* worldPointer, Perlin *p, ivec2 coords, Block* blockList, Gra
     state = ChunkState::OutOfRange;
 	meshDirty = false;
 
-
 	meshLength = 0;
+
+    data = new Block1[16*16*256];
 }
 
 
@@ -32,161 +33,7 @@ void Chunk::loadData()
 }
 
 void Chunk::genChunk() {
-	Perlin p2(6, 4, 1, 50);
-	Perlin p3(1, 1, 2, 59);
-	for (int x = 0; x < CHUNK_SIZE_X; x++) {
-		for (int z = 0; z < CHUNK_SIZE_Z; z++) {
-			int stoneHeight = 60 + 9 * perlin->Get((x + chunkCoords.x * CHUNK_SIZE_X) * 0.003f, (z + chunkCoords.z* CHUNK_SIZE_Z)*0.003f) + 50 * p2.Get((x + chunkCoords.x * CHUNK_SIZE_X) * 0.0003f, (z + chunkCoords.z* CHUNK_SIZE_Z)*0.0003f);
-			for (int y = 0; y < stoneHeight; y++) {
-				data[x][z][y].blockId = 1;
-			}
-			int caveHeight = std::max(10 * p3.Get((x + chunkCoords.x * CHUNK_SIZE_X) * 0.03f, (z + chunkCoords.z* CHUNK_SIZE_Z)*0.03f) ,0.0f);
-			for (int y = stoneHeight - caveHeight; y < stoneHeight + caveHeight; y++) {
-				data[x][z][y].blockId = 0;
-			}
 
-			int dirtHeight = 10 + 5 * perlin->Get((x + chunkCoords.x * CHUNK_SIZE_X)*0.003f, (z + chunkCoords.z* CHUNK_SIZE_Z)*0.003f);
-			for (int y = stoneHeight; y < stoneHeight + dirtHeight; y++) {
-				data[x][z][y].blockId = 2;
-			}
-			data[x][z][dirtHeight + stoneHeight].blockId = 3;
-			for (int y = dirtHeight + stoneHeight + 1; y < CHUNK_SIZE_Y; y++) {
-				data[x][z][y].blockId = 0;
-			}
-		}
-	}
-
-	std::queue<lightPropogationNode> lightQueue;
-	for (int x = chunkCoords.x * CHUNK_SIZE_X; x < (chunkCoords.x + 1) * CHUNK_SIZE_X; ++x) {
-		for (int z = chunkCoords.z * CHUNK_SIZE_Z; z < (chunkCoords.z + 1) * CHUNK_SIZE_Z; ++z) {
-			int y = CHUNK_SIZE_Y - 1;
-
-			setSunlightLevel({ x, z, y }, SUNLIGHT_LEVEL_MAX);
-			lightQueue.push({ {x,z,y}, SUNLIGHT_LEVEL_MAX });
-		}
-	}
-
-	while (!lightQueue.empty()) {
-		lightPropogationNode n = lightQueue.front();
-		lightQueue.pop();
-
-		fvec3 newPos;
-		for (int i = 0; i < 6; ++i) {
-			newPos = n.position + adjecent[i];
-			unsigned short newLight = getSunlightLevel(newPos);
-			if (i != 4) {
-				if (getBlock(newPos) == 0 && newLight < n.lightLevel - 1) {
-					setSunlightLevel(newPos, n.lightLevel - 1);
-					lightQueue.push({ newPos, n.lightLevel - 1 });
-				}
-			}
-			else if (getBlock(newPos) == 0 && newLight < n.lightLevel) {
-				setSunlightLevel(newPos, n.lightLevel);
-				lightQueue.push({ newPos, n.lightLevel });
-
-			}
-		}
-	}
-
-
-	if (getBlock({ (chunkCoords.x * CHUNK_SIZE_X) - 1, chunkCoords.z * CHUNK_SIZE_Z, 0 }) > -1) {
-		for (int z = chunkCoords.z * CHUNK_SIZE_Z; z < (chunkCoords.z + 1) * CHUNK_SIZE_Z; ++z) {
-			for (int y = CHUNK_SIZE_Y - 1; y >= 0; --y) {
-				int x = chunkCoords.x * CHUNK_SIZE_X;
-
-				fvec3 newPos = fvec3{ x,z,y } +adjecent[3];
-				if (getBlock(newPos) == 0 && getBlock({ x,z,y }) == 0) {
-					unsigned short newLight = getSunlightLevel(newPos);
-					unsigned short oldLight = getSunlightLevel({ x,z,y });
-					if (oldLight < newLight - 1) {
-						lightQueue.push({ newPos, newLight });
-					}
-					else if (newLight < oldLight - 1) {
-						lightQueue.push({ { x,z,y }, oldLight });
-					}
-				}
-			}
-		}
-	}
-	if (getBlock({ (chunkCoords.x + 1) * CHUNK_SIZE_X, chunkCoords.z * CHUNK_SIZE_Z, 0 }) > -1) {
-		for (int z = chunkCoords.z * CHUNK_SIZE_Z; z < (chunkCoords.z + 1) * CHUNK_SIZE_Z; ++z) {
-			for (int y = CHUNK_SIZE_Y - 1; y >= 0; --y) {
-				int x = (chunkCoords.x + 1) * CHUNK_SIZE_X - 1;
-
-				fvec3 newPos = fvec3{ x,z,y } +adjecent[2];
-				if (getBlock(newPos) == 0 && getBlock({ x,z,y }) == 0) {
-					unsigned short newLight = getSunlightLevel(newPos);
-					unsigned short oldLight = getSunlightLevel({ x,z,y });
-					if (oldLight < newLight - 1) {
-						lightQueue.push({ newPos, newLight });
-					}
-					else if (newLight < oldLight - 1) {
-						lightQueue.push({ { x,z,y }, oldLight });
-					}
-				}
-			}
-		}
-	}
-	if (getBlock({ chunkCoords.x * CHUNK_SIZE_X, (chunkCoords.z * CHUNK_SIZE_Z) - 1, 0 }) > -1) {
-		for (int x = chunkCoords.x * CHUNK_SIZE_X; x < (chunkCoords.x + 1) * CHUNK_SIZE_X; ++x) {
-			for (int y = CHUNK_SIZE_Y - 1; y >= 0; --y) {
-				int z = chunkCoords.z * CHUNK_SIZE_Z;
-
-				fvec3 newPos = fvec3{ x,z,y } +adjecent[0];
-				if (getBlock(newPos) == 0 && getBlock({ x,z,y }) == 0) {
-					unsigned short newLight = getSunlightLevel(newPos);
-					unsigned short oldLight = getSunlightLevel({ x,z,y });
-					if (oldLight < newLight - 1) {
-						lightQueue.push({ newPos, newLight });
-					}
-					else if (newLight < oldLight - 1) {
-						lightQueue.push({ { x,z,y }, oldLight });
-					}
-				}
-			}
-		}
-	}
-	if (getBlock({ chunkCoords.x * CHUNK_SIZE_X, (chunkCoords.z + 1) * CHUNK_SIZE_Z, 0 }) > -1) {
-		for (int x = chunkCoords.x * CHUNK_SIZE_X; x < (chunkCoords.x + 1) * CHUNK_SIZE_X; ++x) {
-			for (int y = CHUNK_SIZE_Y - 1; y >= 0; --y) {
-				int z = (chunkCoords.z + 1) * CHUNK_SIZE_Z - 1;
-
-				fvec3 newPos = fvec3{ x,z,y } +adjecent[1];
-				if (getBlock(newPos) == 0 && getBlock({ x,z,y }) == 0) {
-					unsigned short newLight = getSunlightLevel(newPos);
-					unsigned short oldLight = getSunlightLevel({ x,z,y });
-					if (oldLight < newLight - 1) {
-						lightQueue.push({ newPos, newLight});
-					}
-					else if (newLight < oldLight -3) {
-						lightQueue.push({ { x,z,y }, oldLight });
-					}
-				}
-			}
-		}
-	}
-	while (!lightQueue.empty()) {
-		lightPropogationNode n = lightQueue.front();
-		lightQueue.pop();
-
-
-		fvec3 newPos;
-		for (int i = 0; i < 6; ++i) {
-			newPos = n.position + adjecent[i];
-			unsigned short newLight = getSunlightLevel(newPos);
-			if (i != 4) {
-				if (getBlock(newPos) == 0 && newLight < n.lightLevel - 1) {
-					setSunlightLevel(newPos, n.lightLevel - 1);
-					lightQueue.push({ newPos, n.lightLevel - 1 });
-				}
-			}
-			else if (getBlock(newPos) == 0 && newLight < n.lightLevel) {
-				setSunlightLevel(newPos, n.lightLevel);
-				lightQueue.push({ newPos, n.lightLevel });
-
-			}
-		}
-	}
 }
 
 float * Chunk::genMesh() {
@@ -359,11 +206,6 @@ fvec3 Chunk::getRelativePosition(fvec3 worldPosition)
 	return worldPosition - (fvec3(chunkCoords.x, chunkCoords.z, 0) * CHUNK_SIZE);
 }
 
-fvec3 Chunk::getWorldPosition(fvec3 relativePosition)
-{
-	return relativePosition + (fvec3(chunkCoords.x, chunkCoords.z, 0) * CHUNK_SIZE);
-}
-
 float Chunk::nearestBound(float pos, float speed)
 {
 	if (speed < 0)
@@ -484,7 +326,7 @@ unsigned short Chunk::getLightLevel(fvec3 worldPosition)
 		return world->getLightLevel(worldPosition);
 	}
 	else
-		return data[(int)floor(rel.x)][(int)floor(rel.z)][(int)floor(rel.y)].lightLevel;
+		return data[flattenVector(floor(rel))].lightLevel;
 }
 
 void Chunk::setLightLevel(fvec3 worldPosition, unsigned short lightLevel)
@@ -492,7 +334,7 @@ void Chunk::setLightLevel(fvec3 worldPosition, unsigned short lightLevel)
 	fvec3 position = getRelativePosition(worldPosition);
 	if (position.x < 0 || position.z < 0 || position.y < 0 || position.x >= CHUNK_SIZE_X || position.z >= CHUNK_SIZE_Z || position.y >= CHUNK_SIZE_Y)
 		return;
-	data[(int)position.x][(int)position.z][(int)position.y].lightLevel = lightLevel;
+	data[flattenVector(floor(position))].lightLevel = lightLevel;
 	meshDirty = true;
 }
 
@@ -504,7 +346,7 @@ unsigned short Chunk::getSunlightLevel(fvec3 worldPosition) {
 		return world->getSunlightLevel(worldPosition);
 	}
 	else
-		return data[(int)floor(rel.x)][(int)floor(rel.z)][(int)floor(rel.y)].sunlightLevel;
+		return data[flattenVector(floor(rel))].sunlightLevel;
 }
 
 void Chunk::setSunlightLevel(fvec3 worldPosition, unsigned short lightLevel)
@@ -516,7 +358,7 @@ void Chunk::setSunlightLevel(fvec3 worldPosition, unsigned short lightLevel)
 		world->setSunlightLevel(worldPosition, lightLevel);
 		return;
 	}
-	data[(int)floor(position.x)][(int)floor(position.z)][(int)floor(position.y)].sunlightLevel = lightLevel;
+	data[flattenVector(floor(position))].sunlightLevel = lightLevel;
 	meshDirty = true;
 }
 
@@ -545,7 +387,7 @@ bool Chunk::checkCollision(AABB box) {
 	for (int i = pos.x; i < bound.x; i++) {
 		for (int j = pos.z; j < bound.z; j++) {
 			for (int k = pos.y; k < bound.y; k++) {
-				if (getBlockRelative({ i, j, k }) > 0)
+				if (getBlock(getRelativePosition({ i, j, k })) > 0)
 					return true;
 			}
 		}
@@ -561,14 +403,7 @@ int Chunk::getBlock(fvec3 worldPosition) {
 		return world->getBlock(worldPosition);
 	}
 	else
-		return data[(int)floor(rel.x)][(int)floor(rel.z)][(int)floor(rel.y)].blockId;
-}
-
-int Chunk::getBlockRelative(fvec3 position) {
-	if (position.x < 0 || position.z < 0 || position.y < 0 || position.x >= CHUNK_SIZE_X || position.z >= CHUNK_SIZE_Z || position.y >= CHUNK_SIZE_Y)
-		return -1;
-	else
-		return data[(int)position.x][(int)position.z][(int)position.y].blockId;
+		return data[flattenVector(floor(rel))].blockId;
 }
 
 void Chunk::setBlock(fvec3 worldPosition, int blockId)
@@ -576,17 +411,14 @@ void Chunk::setBlock(fvec3 worldPosition, int blockId)
 	fvec3 position = getRelativePosition(worldPosition);
 	if (position.x < 0 || position.z < 0 || position.y < 0 || position.x >= CHUNK_SIZE_X || position.z >= CHUNK_SIZE_Z || position.y >= CHUNK_SIZE_Y)
 		return;
-	data[(int)position.x][(int)position.z][(int)position.y].blockId = blockId;
+	data[flattenVector(floor(position))].blockId = blockId;
 	meshDirty = true;
-}
-
-void Chunk::setBlockRelative(fvec3 position, int blockId)
-{
-	if (position.x < 0 || position.z < 0 || position.y < 0 || position.x >= CHUNK_SIZE_X || position.z >= CHUNK_SIZE_Z || position.y >= CHUNK_SIZE_Y)
-		return;
-	data[(int)position.x][(int)position.z][(int)position.y].blockId = blockId;
 }
 
 bool Chunk::isLoaded() {
 	return state >= ChunkState::Loaded;
+}
+
+int Chunk::flattenVector(fvec3 coords) {
+    return coords.y + CHUNK_SIZE.y * (coords.x + CHUNK_SIZE.x * coords.z);
 }

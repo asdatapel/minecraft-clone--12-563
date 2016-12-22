@@ -28,8 +28,6 @@ public:
 	bool checkCollision(AABB box);
 	bool checkCollision(BoundingBox box);
 
-	float * getMesh(ivec2 coords);
-
 	int getBlock(fvec3 position);
 	void setBlock(fvec3 position, int blockId);
 	void removeBlock(fvec3 position);
@@ -45,11 +43,12 @@ public:
 	void createBoxes(int shaderId);
 	void createRandomBoxes(int shaderId);
 	void renderBoxes(glm::mat4 *PV);
-	
-private:
-	//Chunk *chunks[WORLD_CHUNKS_X][WORLD_CHUNKS_Z];
-	std::unordered_map<ivec2, Chunk*> chunks;
 
+private:
+	std::unordered_map<ivec2, Chunk*> chunks;
+    std::queue<fvec3> updateQueue;
+
+    Perlin *perlin;
 	GraphicsManager *graphics;
 	int shader;
 
@@ -57,14 +56,12 @@ private:
 	ivec2 getChunkCoords(fvec3 worldPosition);
 	ivec2 getChunkCoords(ivec2 worldPosition);
 
-	Perlin *perlin;
+    void genChunk(Chunk* chunk);
 
 	std::mutex m;
 	std::condition_variable meshWaiter;
 	std::condition_variable loadWaiter;
 
-	//std::priority_queue<Chunk*, std::vector<Chunk*>, Chunk::Comparator> meshJobs;
-	//std::priority_queue<Chunk*, std::vector<Chunk*>, Chunk::Comparator> loadJobs;
     ivec2 chunkLoadCenter;
     std::list<Chunk*> meshJobs;
     std::list<Chunk*> loadJobs;
@@ -80,7 +77,7 @@ private:
 	bool isChunkInMeshRange(ivec2 chunkCoords, ivec2 playerCoords);
 	bool isChunkNeighborsLoaded(ivec2 chunkCoords);
 
-	void addLight(fvec3 position, int lightLevel);
+	void addLight(fvec3 position, unsigned short lightLevel);
 	void removeLight(fvec3 position);
 
 	std::mutex physMutex;
@@ -88,5 +85,7 @@ private:
 	std::list<Box*> boxes;
 	void physTask();
 	Box *getNextPhysObj();
+
+    int flattenVector(fvec3 coords);
 };
 
