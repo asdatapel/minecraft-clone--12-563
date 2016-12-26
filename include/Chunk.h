@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <math.h>
-#include <atomic>
+#include <stack>
 
 #include "Types.h"
 #include "Const.h"
@@ -29,8 +29,8 @@ enum ChunkState {
 
 struct Block1 {
     unsigned int blockId;
-    unsigned short lightLevel;
-    unsigned short sunlightLevel;
+    LightLevel lightLevel;
+    LightLevel sunlightLevel;
 };
 
 class Chunk {
@@ -40,40 +40,37 @@ public:
     ~Chunk();
 
     void loadData();
-
     void genChunk();
-
     float *genMesh();
 
-    float *genNaiveMesh();
+    Chunk *neighbors[4];
 
     bool isLoaded();
     int flattenVector(fvec3 coords);
 
     bool checkCollision(fvec3 pos);
-
     bool checkCollision(AABB box);
-
     bool raycast(fvec3 position, fvec3 direction, float distance, RayCollision *ray);
 
     int getBlock(fvec3 position);
-
-    void setBlock(fvec3 position, int blockId);
-
+    int getBlockRelative(fvec3 position);
+    void setBlock(fvec3 position, unsigned int blockId);
     void removeBlock(fvec3 position);
-
     void addBlock(fvec3 position, int blockId);
 
-    unsigned short getLightLevel(fvec3 worldPosition);
+    void addLight(fvec3 position, LightLevel lightLevel);
+    void removeLight(fvec3 position);
+    void addSunlight(fvec3 position, LightLevel lightLevel);
+    void removeSunlight(fvec3 position);
+    void updateLight(fvec3 position);
+    void updateSunlight(fvec3 position);
 
-    void setLightLevel(fvec3 worldPosition, unsigned short lightLevel);
-
-    unsigned short getSunlightLevel(fvec3 worldPosition);
-
-    void setSunlightLevel(fvec3 worldPosition, unsigned short lightLevel);
+    LightLevel getLightLevel(fvec3 worldPosition);
+    void setLightLevel(fvec3 worldPosition, LightLevel lightLevel);
+    LightLevel getSunlightLevel(fvec3 worldPosition);
+    void setSunlightLevel(fvec3 worldPosition, LightLevel lightLevel);
 
     void updateBuffer();
-
     void render();
 
     ChunkState state;
@@ -82,18 +79,21 @@ public:
     int meshLength;
     int tempMeshLength;
 
-    class Comparator {
-    public:
-        bool operator()(const Chunk *x1, const Chunk *x2) {
-            return x1->updatePriority > x2->updatePriority;
-        }
-    };
-
-    int updatePriority;
-
+//private:
     World *world;
     Perlin *perlin;
     ivec2 chunkCoords;
+
+    Chunk* getChunkRelative(fvec3 relPosition);
+    Chunk* getChunk(fvec3 relPosition);
+
+    void nullifyLight(fvec3 position);
+    void fillLight(fvec3 position, LightLevel lightLevel);
+    void nullifySunlight(fvec3 position);
+    void fillSunlight(fvec3 position, LightLevel lightLevel);
+
+    void addSunlightLocal(fvec3 position, LightLevel lightLevel);
+
 
     Block1 *data;
     float *mesh;
@@ -104,12 +104,10 @@ public:
     int shader;
 
     void genFace(int side, int x, int z, int y, int arrayTexId, int delta);
-
     int vertexOccluders(fvec3 position, float x, float z, float y, int side);
+    float nearestBound(float pos, float speed);
 
     fvec3 getRelativePosition(fvec3 worldPosition);
-
-    float nearestBound(float pos, float speed);
 
     const float *cube[6] = {
             side0, side1, side2, side3, side4, side5

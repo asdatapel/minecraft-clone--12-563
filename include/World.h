@@ -33,9 +33,9 @@ public:
 	void removeBlock(fvec3 position);
 	void addBlock(fvec3 position, int blockId);
 	void setLightLevel(fvec3 position, unsigned short lightLevel);
-	unsigned short getLightLevel(fvec3 position);
+	LightLevel getLightLevel(fvec3 position);
 	void setSunlightLevel(fvec3 position, unsigned short lightLevel);
-	unsigned short getSunlightLevel(fvec3 position);
+	LightLevel getSunlightLevel(fvec3 position);
 
 	void update(fvec3 playerPos, float elapsedTime);
 	void renderChunks();
@@ -77,7 +77,7 @@ private:
 	bool isChunkInMeshRange(ivec2 chunkCoords, ivec2 playerCoords);
 	bool isChunkNeighborsLoaded(ivec2 chunkCoords);
 
-	void addLight(fvec3 position, unsigned short lightLevel);
+	void addLight(fvec3 position, LightLevel lightLevel);
 	void removeLight(fvec3 position);
 
 	std::mutex physMutex;

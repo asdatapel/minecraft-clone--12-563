@@ -23,8 +23,8 @@ namespace Const {
 
 	const int SUNLIGHT_LEVEL_MAX = 16;
 
-	const fvec3 adjecent[6] = { fvec3{ 0,-1,0 }, fvec3{ 0,1,0 },fvec3{ 1,0,0 },fvec3{ -1,0,0 },fvec3{ 0,0,-1 },fvec3{ 0,0,1 } };
-	const int adjecent_opposite[6] = { 1,0,3,2,5,4};
-	const ivec2 adjecent_chunk[6] = { ivec2{ 0,-1}, ivec2{ 0,1},ivec2{ 1,0},ivec2{ -1,0} };
+	const fvec3 adjacent[6] = { fvec3{ 0,-1,0 }, fvec3{ 0,1,0 },fvec3{ 1,0,0 },fvec3{ -1,0,0 },fvec3{ 0,0,-1 },fvec3{ 0,0,1 } };
+	const int adjacent_opposite[6] = { 1,0,3,2,5,4};
+	const ivec2 adjacent_chunk[6] = { ivec2{ 0,-1}, ivec2{ 0,1},ivec2{ 1,0},ivec2{ -1,0} };
 }
 

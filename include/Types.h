@@ -4,6 +4,9 @@
 #include "BoundingBox.h"
 #include "AABB.h"
 
+typedef short LightLevel;
+
+
 struct RayCollision {
 	bool isCollision;
 	ivec2 chunk;
@@ -14,5 +17,5 @@ struct RayCollision {
 
 struct lightPropogationNode {
 	fvec3 position;
-	int lightLevel;
+	LightLevel lightLevel;
 };

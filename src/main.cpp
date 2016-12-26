@@ -208,14 +208,14 @@ int main() {
                     RayCollision ray = world->raycast(camera.getPosition(), camera.getDirectionVector(), 4);
                     std::cout << ray.blockPos.x << "--" << ray.blockPos.z << "--" << ray.blockPos.y << "-----------"
                               << ray.side << "\n";
-                    if (ray.isCollision && !player.checkCollision(floor(ray.blockPos + adjecent[ray.side])))
-                        world->addBlock(ray.blockPos + adjecent[ray.side], 4);
+                    if (ray.isCollision && !player.checkCollision(floor(ray.blockPos + adjacent[ray.side])))
+                        world->addBlock(ray.blockPos + adjacent[ray.side], 4);
                 } else if (event.mouseButton.button == sf::Mouse::Button::Middle) {
                     RayCollision ray = world->raycast(camera.getPosition(), camera.getDirectionVector(), 4);
                     std::cout << ray.blockPos.x << "--" << ray.blockPos.z << "--" << ray.blockPos.y << "-----------"
                               << ray.side << "-----------" << world->getSunlightLevel(ray.blockPos) << "\n";
-                    if (ray.isCollision && !player.checkCollision(floor(ray.blockPos + adjecent[ray.side])))
-                        world->addBlock(ray.blockPos + adjecent[ray.side], 1);
+                    if (ray.isCollision && !player.checkCollision(floor(ray.blockPos + adjacent[ray.side])))
+                        world->addBlock(ray.blockPos + adjacent[ray.side], 1);
                 }
 
             }
