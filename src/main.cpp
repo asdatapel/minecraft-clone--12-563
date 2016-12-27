@@ -200,10 +200,14 @@ int main() {
             } else if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Button::Left) {
                     RayCollision ray = world->raycast(camera.getPosition(), camera.getDirectionVector(), 4);
-                    std::cout << ray.blockPos.x << "--" << ray.blockPos.z << "--" << ray.blockPos.y << "-----------"
-                              << ray.side << "\n";
-                    if (ray.isCollision)
-                        world->removeBlock(ray.blockPos);
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+                        std::cout << world->getSunlightLevel(ray.blockPos + adjacent[ray.side]) << "\n";
+                    } else {
+                        std::cout << ray.blockPos.x << "--" << ray.blockPos.z << "--" << ray.blockPos.y << "-----------"
+                                  << ray.side << "\n";
+                        if (ray.isCollision)
+                            world->removeBlock(ray.blockPos);
+                    }
                 } else if (event.mouseButton.button == sf::Mouse::Button::Right) {
                     RayCollision ray = world->raycast(camera.getPosition(), camera.getDirectionVector(), 4);
                     std::cout << ray.blockPos.x << "--" << ray.blockPos.z << "--" << ray.blockPos.y << "-----------"
@@ -320,7 +324,7 @@ int main() {
         glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(PV * modelMat));
 
         sunlightTimer += elapsedTime / 2;
-        sunlight = 0.03f + (0.03f * std::sin(sunlightTimer));
+        //sunlight = 0.03f + (0.03f * std::sin(sunlightTimer));
         //sunlight = 0.05;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {

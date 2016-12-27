@@ -46,7 +46,6 @@ public:
 
 private:
 	std::unordered_map<ivec2, Chunk*> chunks;
-    std::queue<fvec3> updateQueue;
 
     Perlin *perlin;
 	GraphicsManager *graphics;
@@ -65,6 +64,7 @@ private:
     ivec2 chunkLoadCenter;
     std::list<Chunk*> meshJobs;
     std::list<Chunk*> loadJobs;
+    Chunk* getNextJob(std::list<Chunk*>* jobs);
     void addCompleteJobToQueue(std::queue<Chunk*> *q, Chunk* job);
     std::queue<Chunk*> finishedMeshJobs;
     std::queue<Chunk*> finishedLoadJobs;

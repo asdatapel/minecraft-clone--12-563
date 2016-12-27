@@ -40,7 +40,7 @@ void World::genChunks(Perlin *p) {
     blocks[3].textures[5].texId = graphics->getArrayTexture("textures/grass.png");
     blocks[3].lightOutput = 2;
     blocks[4].id = 4;
-    blocks[4].lightOutput = 25;
+    blocks[4].lightOutput = 5;
     blocks[4].textures[0].texId = graphics->getArrayTexture("textures/redstone_lamp_on.png");
     blocks[4].textures[1].texId = graphics->getArrayTexture("textures/redstone_lamp_on.png");
     blocks[4].textures[2].texId = graphics->getArrayTexture("textures/redstone_lamp_on.png");
@@ -171,7 +171,7 @@ LightLevel World::getLightLevel(fvec3 position) {
     Chunk *chunk = getChunk(chunkCoords);
 
     if (!chunk)
-        return 8;
+        return -1;
 
     return chunk->getLightLevel(position);
 }
@@ -289,6 +289,7 @@ void World::update(fvec3 playerPos, float elapsedTime) {
     std::unique_lock<std::mutex> lock(m);
 
     ivec2 centerChunk = getChunkCoords(playerPos);
+    chunkLoadCenter = centerChunk;
     for (auto chunk = chunks.begin(); chunk != chunks.end();) {
         ivec2 vec = chunk->first;
         if (!isChunkInLoadRange(vec, centerChunk)) {
@@ -346,20 +347,23 @@ void World::update(fvec3 playerPos, float elapsedTime) {
     while (!finishedLoadJobs.empty()) {
         Chunk *job = finishedLoadJobs.front();
         finishedLoadJobs.pop();
+
+        job->state = ChunkState::Loaded;
+
         for (int k = 0; k < CHUNK_SIZE_Y; ++k) {
             for (int i = job->chunkCoords.x * CHUNK_SIZE_X; i < job->chunkCoords.x * CHUNK_SIZE_X + CHUNK_SIZE_X; ++i) {
-                if (job->neighbors[0]) {
+                if (job->neighbors[0] && job->neighbors[0]->isLoaded()) {
                     job->neighbors[0]->updateSunlight({i, job->chunkCoords.z * CHUNK_SIZE_Z - 1, k});
                 }
-                if (job->neighbors[1]) {
+                if (job->neighbors[1] && job->neighbors[1]->isLoaded()) {
                     job->neighbors[1]->updateSunlight({i, job->chunkCoords.z * CHUNK_SIZE_Z + CHUNK_SIZE_Z, k});
                 }
             }
             for (int j = job->chunkCoords.z * CHUNK_SIZE_Z; j < job->chunkCoords.z * CHUNK_SIZE_Z + CHUNK_SIZE_Z; ++j) {
-                if (job->neighbors[3]) {
+                if (job->neighbors[3] && job->neighbors[3]->isLoaded()) {
                     job->neighbors[3]->updateSunlight({job->chunkCoords.x * CHUNK_SIZE_X - 1, j, k});
                 }
-                if (job->neighbors[2]) {
+                if (job->neighbors[2] && job->neighbors[2]->isLoaded()) {
                     job->neighbors[2]->updateSunlight({job->chunkCoords.x * CHUNK_SIZE_X + CHUNK_SIZE_X, j, k});
                 }
             }
@@ -371,7 +375,6 @@ void World::update(fvec3 playerPos, float elapsedTime) {
             }
         }
 
-        job->state = ChunkState::Loaded;
         job->meshDirty = true;
     }
 
@@ -403,6 +406,7 @@ Chunk *World::getChunk(ivec2 coords) {
 }
 
 ivec2 World::getChunkCoords(fvec3 worldPosition) {
+    worldPosition = floor(worldPosition);
     return {worldPosition.x / CHUNK_SIZE_X, worldPosition.z / CHUNK_SIZE_Z};
 }
 
@@ -458,6 +462,21 @@ void World::addCompleteJobToQueue(std::queue<Chunk *> *q, Chunk *job) {
     q->push(job);
 }
 
+Chunk* World::getNextJob(std::list<Chunk*>* jobs){
+    std::list<Chunk*>::iterator max_i;
+    int min = 3000;
+    for (std::list<Chunk*>::iterator i = jobs->begin(); i != jobs->end(); ++i){
+        int d = std::abs((*i)->chunkCoords.x - chunkLoadCenter.x) + std::abs((*i)->chunkCoords.z - chunkLoadCenter.z);
+        if (d < min) {
+            min = d;
+            max_i = i;
+        }
+    }
+    Chunk* job = *max_i;
+    jobs->erase(max_i);
+    return job;
+}
+
 void World::meshTask() {
     while (true) {
         Chunk *job = getNextMeshJob();
@@ -472,8 +491,7 @@ Chunk *World::getNextMeshJob() {
 
     while (true) {
         if (!meshJobs.empty()) {
-            Chunk *job = meshJobs.front();
-            meshJobs.pop_front();
+            Chunk *job = getNextJob(&meshJobs);
             job->state = ChunkState::CurrentlyMeshing;
             return job;
         }
@@ -496,8 +514,7 @@ Chunk *World::getNextLoadJob() {
 
     while (true) {
         if (!loadJobs.empty()) {
-            Chunk *job = loadJobs.front();
-            loadJobs.pop_front();
+            Chunk *job = getNextJob(&loadJobs);
             job->state = ChunkState::CurrentlyLoading;
             return job;
         }
@@ -581,10 +598,11 @@ void World::genChunk(Chunk *chunk) {
             /*int caveHeight = (int) std::max(10 * p3.Get((coords.x + chunkCoords.x * CHUNK_SIZE_X) * 0.03f,
             (coords.z + chunkCoords.z * CHUNK_SIZE_Z) * 0.03f), 0.0f);*/
             int caveHeight = 0;
-            if (chunkCoords.x % 2 == 0)
-                caveHeight = coords.x;
+            if (chunkCoords.z % 2 == 0)
+                caveHeight = 16 - coords.x;
             for (coords.y = stoneHeight; coords.y < stoneHeight + caveHeight; coords.y++) {
                 data[flattenVector(coords)].blockId = 0;
+                data[flattenVector(coords)].sunlightLevel = 0;
             }
 
             /*int dirtHeight = (int) (10 + 5 * perlin->Get((coords.x + chunkCoords.x * CHUNK_SIZE_X) * 0.003f,
@@ -593,6 +611,7 @@ void World::genChunk(Chunk *chunk) {
             for (coords.y = stoneHeight + caveHeight; coords.y < stoneHeight + dirtHeight; coords.y++) {
                 data[flattenVector(coords)].blockId = 2;
                 data[flattenVector(coords)].lightLevel = 0;
+                data[flattenVector(coords)].sunlightLevel = 0;
             }
             data[flattenVector({coords.x, coords.z, (float) dirtHeight + stoneHeight + caveHeight})].blockId = 3;
             for (coords.y = dirtHeight + stoneHeight + caveHeight + 1; coords.y < CHUNK_SIZE_Y; coords.y++) {
