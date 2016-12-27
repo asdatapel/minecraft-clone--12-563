@@ -80,9 +80,11 @@ void Chunk::genFace(int side, int x, int z, int y, int arrayTexId, int delta) {
     const float *sideMesh = cube[side];
 
     int vertAos[4];
+    LightLevel lighting[4];
     for (int vert = 0; vert < 4; ++vert) {
         int i = vert * 5;
         vertAos[vert] = vertexOccluders({x, z, y}, sideMesh[i], sideMesh[i + 2], sideMesh[i + 1], side);
+        lighting[vert] = getVertexLight({x, z, y}, sideMesh[i], sideMesh[i + 2], sideMesh[i + 1], side);
     }
 
     const int *vert_order;
@@ -103,7 +105,7 @@ void Chunk::genFace(int side, int x, int z, int y, int arrayTexId, int delta) {
         int aoLevel = vertAos[vert_order[vert]];
 
         for (int k = i + 3; k < i + 6; k++) {
-            mesh[delta + k] = (float)getLightLevel(fvec3{x, z, y} + adjacent[side]) * 0.1f;
+            mesh[delta + k] = lighting[vert_order[vert]] * 0.05f;
         }
 
         mesh[delta + i + 6] = getSunlightLevel(fvec3{x, z, y} + adjacent[side]);
@@ -145,6 +147,46 @@ int Chunk::vertexOccluders(fvec3 position, float x, float z, float y, int side) 
     if (side1 && side2)
         return 0;
     return 3 - (side1 + side2 + corner);
+}
+LightLevel Chunk::getVertexLight(fvec3 position, float x, float z, float y, int side) {
+    int xSide = (x > 0) ? 1 : -1;
+    int ySide = (y > 0) ? 1 : -1;
+    int zSide = (z > 0) ? 1 : -1;
+
+    int side1Block;
+    int side2Block;
+
+    LightLevel side1;
+    LightLevel side2;
+    LightLevel corner;
+
+    if (side > 3) {
+        side1Block = (getBlock(position + fvec3(xSide, 0, ySide)) > 0) ? 1 : 0;
+        side2Block = (getBlock(position + fvec3(0, zSide, ySide)) > 0) ? 1 : 0;
+
+        side1 = getLightLevel(position + fvec3(xSide, 0, ySide));
+        side2 = getLightLevel(position + fvec3(0, zSide, ySide));
+        corner = getLightLevel(position + fvec3(xSide, zSide, ySide));
+    } else if (side < 2) {
+        side1Block = (getBlock(position + fvec3(xSide, zSide, 0)) > 0) ? 1 : 0;
+        side2Block = (getBlock(position + fvec3(0, zSide, ySide)) > 0) ? 1 : 0;
+
+        side1 = getLightLevel(position + fvec3(xSide, zSide, 0));
+        side2 = getLightLevel(position + fvec3(0, zSide, ySide));
+        corner = getLightLevel(position + fvec3(xSide, zSide, ySide));
+    } else {
+        side1Block = (getBlock(position + fvec3(xSide, 0, ySide)) > 0) ? 1 : 0;
+        side2Block = (getBlock(position + fvec3(xSide, zSide, 0)) > 0) ? 1 : 0;
+
+        side1 = getLightLevel(position + fvec3(xSide, 0, ySide));
+        side2 = getLightLevel(position + fvec3(xSide, zSide, 0));
+        corner = getLightLevel(position + fvec3(xSide, zSide, ySide));
+    }
+
+    if (side1Block && side2Block)
+        return ((side1 > 0) ? side1 : (LightLevel) 0) + ((side2 > 0) ? side2 : (LightLevel) 0);
+    return ((side1 > 0) ? side1 : (LightLevel) 0) + ((side2 > 0) ? side2 : (LightLevel) 0) +
+           ((corner > 0) ? corner : (LightLevel) 0);
 }
 
 bool Chunk::raycast(fvec3 origin, fvec3 direction, float distance, RayCollision *ray) {
@@ -513,11 +555,14 @@ void Chunk::updateSunlight(fvec3 position) {
 
 LightLevel Chunk::getLightLevel(fvec3 worldPosition) {
     fvec3 rel = getRelativePosition(worldPosition);
-    if (rel.y < 0 || rel.y >= CHUNK_SIZE_Y)
-        return 0;
-    else if (rel.x < 0 || rel.z < 0 || rel.z >= CHUNK_SIZE_Z || rel.x >= CHUNK_SIZE_X) {
-        return world->getLightLevel(worldPosition);
-    } else
+    if (rel.y < 0 || rel.y >= CHUNK_SIZE_Y) {
+        return -1;
+    }else if (rel.x < 0 || rel.z < 0 || rel.z >= CHUNK_SIZE_Z || rel.x >= CHUNK_SIZE_X) {
+        Chunk *chunk = getChunk(worldPosition);
+        if (chunk){
+            return chunk->getLightLevel(worldPosition);
+        }
+    }else
         return data[flattenVector(floor(rel))].lightLevel;
 }
 
@@ -532,10 +577,8 @@ void Chunk::setLightLevel(fvec3 worldPosition, LightLevel lightLevel) {
 
 LightLevel Chunk::getSunlightLevel(fvec3 worldPosition) {
     fvec3 rel = getRelativePosition(worldPosition);
-    if (rel.y < 0 || rel.y >= CHUNK_SIZE_Y)
-        return 0;
-    else if (rel.x < 0 || rel.z < 0 || rel.z >= CHUNK_SIZE_Z || rel.x >= CHUNK_SIZE_X) {
-        return world->getSunlightLevel(worldPosition);
+    if (rel.y < 0 || rel.y >= CHUNK_SIZE_Y || rel.x < 0 || rel.z < 0 || rel.z >= CHUNK_SIZE_Z || rel.x >= CHUNK_SIZE_X) {
+        return -1;
     } else
         return data[flattenVector(floor(rel))].sunlightLevel;
 }

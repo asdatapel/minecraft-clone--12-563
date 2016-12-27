@@ -105,6 +105,7 @@ public:
 
     void genFace(int side, int x, int z, int y, int arrayTexId, int delta);
     int vertexOccluders(fvec3 position, float x, float z, float y, int side);
+    LightLevel getVertexLight(fvec3 position, float x, float z, float y, int side);
     float nearestBound(float pos, float speed);
 
     fvec3 getRelativePosition(fvec3 worldPosition);

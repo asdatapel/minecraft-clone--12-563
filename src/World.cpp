@@ -236,7 +236,7 @@ void World::setBlock(fvec3 position, int blockId) {
     }
 }
 
-#define VISIBLE_CHUNKS 3
+#define VISIBLE_CHUNKS 10
 
 void World::update(fvec3 playerPos, float elapsedTime) {
 
@@ -592,6 +592,7 @@ void World::genChunk(Chunk *chunk) {
             int dirtHeight = 0;
             for (coords.y = stoneHeight + caveHeight; coords.y < stoneHeight + dirtHeight; coords.y++) {
                 data[flattenVector(coords)].blockId = 2;
+                data[flattenVector(coords)].lightLevel = 0;
             }
             data[flattenVector({coords.x, coords.z, (float) dirtHeight + stoneHeight + caveHeight})].blockId = 3;
             for (coords.y = dirtHeight + stoneHeight + caveHeight + 1; coords.y < CHUNK_SIZE_Y; coords.y++) {

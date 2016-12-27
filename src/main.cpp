@@ -320,7 +320,7 @@ int main() {
         glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(PV * modelMat));
 
         sunlightTimer += elapsedTime / 2;
-        //sunlight = 0.03f + (0.03f * std::sin(sunlightTimer));
+        sunlight = 0.03f + (0.03f * std::sin(sunlightTimer));
         //sunlight = 0.05;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
