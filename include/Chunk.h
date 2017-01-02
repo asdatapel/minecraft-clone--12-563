@@ -29,7 +29,8 @@ enum ChunkState {
 
 struct Block1 {
     unsigned int blockId;
-    LightLevel lightLevel;
+    //LightLevel lightLevel;
+    LightLevel lightLevel[3];
     LightLevel sunlightLevel;
 };
 
@@ -58,15 +59,15 @@ public:
     void removeBlock(fvec3 position);
     void addBlock(fvec3 position, int blockId);
 
-    void addLight(fvec3 position, LightLevel lightLevel);
-    void removeLight(fvec3 position);
+    void addLight(fvec3 position, LightLevel lightLevel, int channel);
+    void removeLight(fvec3 position, int channel);
     void addSunlight(fvec3 position, LightLevel lightLevel);
     void removeSunlight(fvec3 position);
-    void updateLight(fvec3 position);
+    void updateLight(fvec3 position, int channel);
     void updateSunlight(fvec3 position);
 
-    LightLevel getLightLevel(fvec3 worldPosition);
-    void setLightLevel(fvec3 worldPosition, LightLevel lightLevel);
+    LightLevel getLightLevel(fvec3 worldPosition, int channel);
+    void setLightLevel(fvec3 worldPosition, LightLevel lightLevel, int channel);
     LightLevel getSunlightLevel(fvec3 worldPosition);
     void setSunlightLevel(fvec3 worldPosition, LightLevel lightLevel);
 
@@ -87,8 +88,8 @@ public:
     Chunk* getChunkRelative(fvec3 relPosition);
     Chunk* getChunk(fvec3 relPosition);
 
-    void nullifyLight(fvec3 position);
-    void fillLight(fvec3 position, LightLevel lightLevel);
+    void nullifyLight(fvec3 position, int channel);
+    void fillLight(fvec3 position, LightLevel lightLevel, int channel);
     void nullifySunlight(fvec3 position);
     void fillSunlight(fvec3 position, LightLevel lightLevel);
 
@@ -105,7 +106,8 @@ public:
 
     void genFace(int side, int x, int z, int y, int arrayTexId, int delta);
     int vertexOccluders(fvec3 position, float x, float z, float y, int side);
-    LightLevel getVertexLight(fvec3 position, float x, float z, float y, int side);
+    LightLevel getVertexLight(fvec3 position, float x, float z, float y, int side, int channel);
+    LightLevel getVertexSunlight(fvec3 position, float x, float z, float y, int side);
     float nearestBound(float pos, float speed);
 
     fvec3 getRelativePosition(fvec3 worldPosition);

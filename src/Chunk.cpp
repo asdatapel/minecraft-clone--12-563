@@ -79,16 +79,20 @@ float *Chunk::genMesh() {
 void Chunk::genFace(int side, int x, int z, int y, int arrayTexId, int delta) {
     const float *sideMesh = cube[side];
 
-    int vertAos[4];
+    LightLevel sunlight[4];
     LightLevel lighting[4];
+    LightLevel lighting1[4];
+    LightLevel lighting2[4];
     for (int vert = 0; vert < 4; ++vert) {
         int i = vert * 5;
-        vertAos[vert] = vertexOccluders({x, z, y}, sideMesh[i], sideMesh[i + 2], sideMesh[i + 1], side);
-        lighting[vert] = getVertexLight({x, z, y}, sideMesh[i], sideMesh[i + 2], sideMesh[i + 1], side);
+        sunlight[vert] = getVertexSunlight({x, z, y}, sideMesh[i], sideMesh[i + 2], sideMesh[i + 1], side);
+        lighting[vert] = getVertexLight({x, z, y}, sideMesh[i], sideMesh[i + 2], sideMesh[i + 1], side, 0);
+        lighting1[vert] = getVertexLight({x, z, y}, sideMesh[i], sideMesh[i + 2], sideMesh[i + 1], side, 1);
+        lighting2[vert] = getVertexLight({x, z, y}, sideMesh[i], sideMesh[i + 2], sideMesh[i + 1], side, 2);
     }
 
-    const int *vert_order;
-    if (lighting[0] + lighting[3] < lighting[1] + lighting[2])
+    const int *vert_order = faces;
+    if (sunlight[0] + sunlight[3] < sunlight[1] + sunlight[2])
         vert_order = faces;
     else
         vert_order = alt_faces;
@@ -102,15 +106,13 @@ void Chunk::genFace(int side, int x, int z, int y, int arrayTexId, int delta) {
         mesh[delta + i + 1] = sideMesh[vertexDelta + 1] + y;
         mesh[delta + i + 2] = sideMesh[vertexDelta + 2] + z;
 
-        int aoLevel = vertAos[vert_order[vert]];
+        mesh[delta + i + 3] = lighting[vert_order[vert]] * 0.05f;
+        mesh[delta + i + 4] = lighting1[vert_order[vert]] * 0.05f;
+        mesh[delta + i + 5] = lighting2[vert_order[vert]] * 0.05f;
 
-        for (int k = i + 3; k < i + 6; k++) {
-            mesh[delta + k] = lighting[vert_order[vert]] * 0.05f;
-        }
+        mesh[delta + i + 6] = sunlight[vert_order[vert]] * 0.5f;
 
-        mesh[delta + i + 6] = getSunlightLevel(fvec3{x, z, y} + adjacent[side]);
-
-        mesh[delta + i + 7] = aoLevel;
+        mesh[delta + i + 7] = 1;
 
         mesh[delta + i + 8] = sideMesh[vertexDelta + 3];
         mesh[delta + i + 9] = sideMesh[vertexDelta + 4];
@@ -149,7 +151,7 @@ int Chunk::vertexOccluders(fvec3 position, float x, float z, float y, int side) 
     return 3 - (side1 + side2 + corner);
 }
 
-LightLevel Chunk::getVertexLight(fvec3 position, float x, float z, float y, int side) {
+LightLevel Chunk::getVertexLight(fvec3 position, float x, float z, float y, int side, int channel) {
     int xSide = (x > 0) ? 1 : -1;
     int ySide = (y > 0) ? 1 : -1;
     int zSide = (z > 0) ? 1 : -1;
@@ -166,26 +168,72 @@ LightLevel Chunk::getVertexLight(fvec3 position, float x, float z, float y, int 
         side1Block = (getBlock(position + fvec3(xSide, 0, ySide)) > 0) ? 1 : 0;
         side2Block = (getBlock(position + fvec3(0, zSide, ySide)) > 0) ? 1 : 0;
 
-        side1 = getLightLevel(position + fvec3(xSide, 0, ySide));
-        side2 = getLightLevel(position + fvec3(0, zSide, ySide));
-        top = getLightLevel(position + fvec3(0, 0, ySide));
-        corner = getLightLevel(position + fvec3(xSide, zSide, ySide));
+        side1 = getLightLevel(position + fvec3(xSide, 0, ySide), channel);
+        side2 = getLightLevel(position + fvec3(0, zSide, ySide), channel);
+        top = getLightLevel(position + fvec3(0, 0, ySide), channel);
+        corner = getLightLevel(position + fvec3(xSide, zSide, ySide), channel);
     } else if (side < 2) {
         side1Block = (getBlock(position + fvec3(xSide, zSide, 0)) > 0) ? 1 : 0;
         side2Block = (getBlock(position + fvec3(0, zSide, ySide)) > 0) ? 1 : 0;
 
-        side1 = getLightLevel(position + fvec3(xSide, zSide, 0));
-        side2 = getLightLevel(position + fvec3(0, zSide, ySide));
-        top = getLightLevel(position + fvec3(0, zSide, 0));
-        corner = getLightLevel(position + fvec3(xSide, zSide, ySide));
+        side1 = getLightLevel(position + fvec3(xSide, zSide, 0), channel);
+        side2 = getLightLevel(position + fvec3(0, zSide, ySide), channel);
+        top = getLightLevel(position + fvec3(0, zSide, 0), channel);
+        corner = getLightLevel(position + fvec3(xSide, zSide, ySide), channel);
     } else {
         side1Block = (getBlock(position + fvec3(xSide, 0, ySide)) > 0) ? 1 : 0;
         side2Block = (getBlock(position + fvec3(xSide, zSide, 0)) > 0) ? 1 : 0;
 
-        side1 = getLightLevel(position + fvec3(xSide, 0, ySide));
-        side2 = getLightLevel(position + fvec3(xSide, zSide, 0));
-        top = getLightLevel(position + fvec3(xSide, 0, 0));
-        corner = getLightLevel(position + fvec3(xSide, zSide, ySide));
+        side1 = getLightLevel(position + fvec3(xSide, 0, ySide), channel);
+        side2 = getLightLevel(position + fvec3(xSide, zSide, 0), channel);
+        top = getLightLevel(position + fvec3(xSide, 0, 0), channel);
+        corner = getLightLevel(position + fvec3(xSide, zSide, ySide), channel);
+    }
+
+    if (side1Block && side2Block)
+        return ((side1 > 0) ? side1 : (LightLevel) 0) + ((side2 > 0) ? side2 : (LightLevel) 0) +
+               ((top > 0) ? top : (LightLevel) 0);
+    return ((side1 > 0) ? side1 : (LightLevel) 0) + ((side2 > 0) ? side2 : (LightLevel) 0) +
+           ((corner > 0) ? corner : (LightLevel) 0) + ((top > 0) ? top : (LightLevel) 0);
+}
+
+LightLevel Chunk::getVertexSunlight(fvec3 position, float x, float z, float y, int side) {
+    int xSide = (x > 0) ? 1 : -1;
+    int ySide = (y > 0) ? 1 : -1;
+    int zSide = (z > 0) ? 1 : -1;
+
+    int side1Block;
+    int side2Block;
+
+    LightLevel side1;
+    LightLevel side2;
+    LightLevel top;
+    LightLevel corner;
+
+    if (side > 3) {
+        side1Block = (getBlock(position + fvec3(xSide, 0, ySide)) > 0) ? 1 : 0;
+        side2Block = (getBlock(position + fvec3(0, zSide, ySide)) > 0) ? 1 : 0;
+
+        side1 = getSunlightLevel(position + fvec3(xSide, 0, ySide));
+        side2 = getSunlightLevel(position + fvec3(0, zSide, ySide));
+        top = getSunlightLevel(position + fvec3(0, 0, ySide));
+        corner = getSunlightLevel(position + fvec3(xSide, zSide, ySide));
+    } else if (side < 2) {
+        side1Block = (getBlock(position + fvec3(xSide, zSide, 0)) > 0) ? 1 : 0;
+        side2Block = (getBlock(position + fvec3(0, zSide, ySide)) > 0) ? 1 : 0;
+
+        side1 = getSunlightLevel(position + fvec3(xSide, zSide, 0));
+        side2 = getSunlightLevel(position + fvec3(0, zSide, ySide));
+        top = getSunlightLevel(position + fvec3(0, zSide, 0));
+        corner = getSunlightLevel(position + fvec3(xSide, zSide, ySide));
+    } else {
+        side1Block = (getBlock(position + fvec3(xSide, 0, ySide)) > 0) ? 1 : 0;
+        side2Block = (getBlock(position + fvec3(xSide, zSide, 0)) > 0) ? 1 : 0;
+
+        side1 = getSunlightLevel(position + fvec3(xSide, 0, ySide));
+        side2 = getSunlightLevel(position + fvec3(xSide, zSide, 0));
+        top = getSunlightLevel(position + fvec3(xSide, 0, 0));
+        corner = getSunlightLevel(position + fvec3(xSide, zSide, ySide));
     }
 
     if (side1Block && side2Block)
@@ -278,10 +326,11 @@ float Chunk::nearestBound(float pos, float speed) {
         return (floor(pos) + (speed > 0 ? 1 : 0) - pos) / speed;
 }
 
-void Chunk::addLight(fvec3 position, LightLevel lightLevel) {
+void Chunk::addLight(fvec3 position, LightLevel lightLevel, int channel) {
     std::queue<lightPropogationNode> lightQueue;
 
-    data[flattenVector(getRelativePosition(position))].lightLevel = lightLevel;
+    data[flattenVector(getRelativePosition(position))].lightLevel[channel] = lightLevel;
+    meshDirty = true;
     lightQueue.push({position, lightLevel});
 
     while (!lightQueue.empty()) {
@@ -294,13 +343,14 @@ void Chunk::addLight(fvec3 position, LightLevel lightLevel) {
             Chunk *chunk = getChunk(newPos);
             if (chunk) {
                 if (chunk == this) {
-                    if (getBlock(newPos) == 0 && getLightLevel(newPos) < n.lightLevel - 1) {
-                        data[flattenVector(getRelativePosition(newPos))].lightLevel = n.lightLevel - (LightLevel) 1;
+                    if (getBlock(newPos) == 0 && getLightLevel(newPos, channel) < n.lightLevel - 1) {
+                        data[flattenVector(getRelativePosition(newPos))].lightLevel[channel] =
+                                n.lightLevel - (LightLevel) 1;
                         meshDirty = true;
                         lightQueue.push({newPos, (LightLevel) (n.lightLevel - 1)});
                     }
-                } else if (chunk->getBlock(newPos) == 0 && chunk->getLightLevel(newPos) < n.lightLevel - 1) {
-                    chunk->addLight(newPos, (LightLevel) (n.lightLevel - 1));
+                } else if (chunk->getBlock(newPos) == 0 && chunk->getLightLevel(newPos, channel) < n.lightLevel - 1) {
+                    chunk->addLight(newPos, (LightLevel) (n.lightLevel - 1), channel);
                 }
             }
         }
@@ -312,14 +362,12 @@ void Chunk::addSunlight(fvec3 position, LightLevel lightLevel) {
     std::queue<lightPropogationNode> lightQueue;
 
     data[flattenVector(getRelativePosition(position))].sunlightLevel = lightLevel;
+    meshDirty = true;
     lightQueue.push({position, lightLevel});
 
     while (!lightQueue.empty()) {
         lightPropogationNode n = lightQueue.front();
         lightQueue.pop();
-
-        if (n.position == fvec3{1, 13, 74})
-            n.position = n.position;
 
         fvec3 newPos;
         for (int i = 0; i < 6; i++) {
@@ -349,20 +397,22 @@ void Chunk::addSunlight(fvec3 position, LightLevel lightLevel) {
     }
 }
 
-void Chunk::removeLight(fvec3 position) {
-    nullifyLight(position);
-    fillLight(position, 0);
-
+void Chunk::removeLight(fvec3 position, int channel) {
+    nullifyLight(position, channel);
+    fillLight(position, 0, channel);
+}
+void Chunk::removeSunlight(fvec3 position){
     nullifySunlight(position);
     fillSunlight(position, 0);
 }
 
-void Chunk::nullifyLight(fvec3 position) {
+
+void Chunk::nullifyLight(fvec3 position, int channel) {
     std::queue<lightPropogationNode> removalQueue;
     std::queue<lightPropogationNode> otherRemovalQueue;
 
-    removalQueue.push({position, getLightLevel(position)});
-    setLightLevel(position, -1);
+    removalQueue.push({position, getLightLevel(position, channel)});
+    setLightLevel(position, -1, channel);
 
     while (!removalQueue.empty()) {
         lightPropogationNode n = removalQueue.front();
@@ -373,12 +423,12 @@ void Chunk::nullifyLight(fvec3 position) {
             newPos = n.position + adjacent[i];
             Chunk *chunk = getChunk(newPos);
             if (chunk) {
-                LightLevel newLight = chunk->getLightLevel(newPos);
+                LightLevel newLight = chunk->getLightLevel(newPos, channel);
                 if (chunk == this) {
                     if (newLight < n.lightLevel) {
                         if (getBlock(newPos) == 0 && newLight > 0) {
                             removalQueue.push({newPos, newLight});
-                            setLightLevel(newPos, -1);
+                            setLightLevel(newPos, -1, channel);
                             meshDirty = true;
                         }
                     }
@@ -397,15 +447,15 @@ void Chunk::nullifyLight(fvec3 position) {
 
         Chunk *chunk = getChunk(n.position);
         if (chunk) {
-            chunk->nullifyLight(n.position);
+            chunk->nullifyLight(n.position, channel);
         }
     }
 }
 
-void Chunk::fillLight(fvec3 position, LightLevel lightLevel) {
+void Chunk::fillLight(fvec3 position, LightLevel lightLevel, int channel) {
     std::queue<lightPropogationNode> fillQueue;
 
-    setLightLevel(position, 0);
+    setLightLevel(position, 0, channel);
     meshDirty = true;
     fillQueue.push({position, lightLevel});
     while (!fillQueue.empty()) {
@@ -419,16 +469,16 @@ void Chunk::fillLight(fvec3 position, LightLevel lightLevel) {
             Chunk *chunk = getChunk(newPos);
             if (chunk) {
                 if (chunk == this) {
-                    if (getBlock(newPos) == 0 && getLightLevel(newPos) == -1) {
-                        setLightLevel(newPos, 0);
+                    if (getBlock(newPos) == 0 && getLightLevel(newPos, channel) == -1) {
+                        setLightLevel(newPos, 0, channel);
                         meshDirty = true;
                         fillQueue.push({newPos, (LightLevel) (n.lightLevel - 1)});
                     } else {
-                        addLight(newPos, getLightLevel(newPos));
+                        addLight(newPos, getLightLevel(newPos, channel), channel);
                     }
                 } else {
-                    if (chunk->getBlock(newPos) == 0 && chunk->getLightLevel(newPos) == -1) {
-                        chunk->fillLight(newPos, (LightLevel) (n.lightLevel - 1));
+                    if (chunk->getBlock(newPos) == 0 && chunk->getLightLevel(newPos, channel) == -1) {
+                        chunk->fillLight(newPos, (LightLevel) (n.lightLevel - 1), channel);
                     }
                 }
             }
@@ -516,7 +566,7 @@ void Chunk::fillSunlight(fvec3 position, LightLevel lightLevel) {
     }
 }
 
-void Chunk::updateLight(fvec3 position) {
+void Chunk::updateLight(fvec3 position, int channel) {
     if (getBlock(position) != 0) {
         return;
     }
@@ -525,17 +575,17 @@ void Chunk::updateLight(fvec3 position) {
     for (int i = 0; i < 6; ++i) {
         Chunk *chunk = getChunk(position);
         if (chunk) {
-            LightLevel l = chunk->getLightLevel(position + adjacent[i]);
+            LightLevel l = chunk->getLightLevel(position + adjacent[i], channel);
             if (l > max_adjacent) {
                 max_adjacent = l;
                 max_adjacent_i = i;
             }
         }
     }
-    if (max_adjacent > getLightLevel(position)) {
-        addLight(position + adjacent[max_adjacent_i], max_adjacent);
+    if (max_adjacent > getLightLevel(position, channel)) {
+        addLight(position + adjacent[max_adjacent_i], max_adjacent, channel);
     } else {
-        addLight(position, getLightLevel(position));
+        addLight(position, getLightLevel(position, channel), channel);
     }
 }
 
@@ -543,6 +593,8 @@ void Chunk::updateSunlight(fvec3 position) {
     if (getBlock(position) != 0) {
         return;
     }
+    if (position == fvec3{15, 0, 40})
+        position = position;
     LightLevel max_adjacent = 0;
     int max_adjacent_i = -1;
     for (int i = 0; i < 6; ++i) {
@@ -565,26 +617,26 @@ void Chunk::updateSunlight(fvec3 position) {
     }
 }
 
-LightLevel Chunk::getLightLevel(fvec3 worldPosition) {
+LightLevel Chunk::getLightLevel(fvec3 worldPosition, int channel) {
     fvec3 rel = getRelativePosition(worldPosition);
     if (rel.y < 0 || rel.y >= CHUNK_SIZE_Y) {
         return -1;
     } else if (rel.x < 0 || rel.z < 0 || rel.z >= CHUNK_SIZE_Z || rel.x >= CHUNK_SIZE_X) {
         Chunk *chunk = getChunk(worldPosition);
         if (chunk) {
-            return chunk->getLightLevel(worldPosition);
+            return chunk->getLightLevel(worldPosition, channel);
         } else
             return 0;
     } else
-        return data[flattenVector(floor(rel))].lightLevel;
+        return data[flattenVector(floor(rel))].lightLevel[channel];
 }
 
-void Chunk::setLightLevel(fvec3 worldPosition, LightLevel lightLevel) {
+void Chunk::setLightLevel(fvec3 worldPosition, LightLevel lightLevel, int channel) {
     fvec3 position = getRelativePosition(worldPosition);
     if (position.x < 0 || position.z < 0 || position.y < 0 || position.x >= CHUNK_SIZE_X ||
         position.z >= CHUNK_SIZE_Z || position.y >= CHUNK_SIZE_Y)
         return;
-    data[flattenVector(floor(position))].lightLevel = lightLevel;
+    data[flattenVector(floor(position))].lightLevel[channel] = lightLevel;
     meshDirty = true;
 }
 
@@ -651,7 +703,7 @@ Chunk *Chunk::getChunk(fvec3 position) {
         return nullptr;
     }
 
-    Chunk* chunk;
+    Chunk *chunk;
     if (relPosition.x < 0) {
         chunk = neighbors[3];
     } else if (relPosition.z < 0) {
@@ -664,7 +716,7 @@ Chunk *Chunk::getChunk(fvec3 position) {
         return this;
     }
 
-    if (chunk && chunk->isLoaded()){
+    if (chunk && chunk->isLoaded()) {
         return chunk;
     }
 

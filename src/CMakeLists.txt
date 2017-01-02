@@ -1,4 +1,4 @@
-set(SOURCE_FILES main.cpp AABB.cpp Block.cpp BlockAir.cpp BlockDirt.cpp BlockGlowstoneLamp.cpp BlockGrass.cpp Blocks.cpp BlockStone.cpp BlockWater.cpp BoundingBox.cpp Camera.cpp Chunk.cpp DebugDrawer.cpp GraphicsManager.cpp Perlin.cpp Player.cpp simplexnoise.cpp vec.cpp World.cpp PhysicsObj.cpp Box.cpp)
+set(SOURCE_FILES main.cpp AABB.cpp Block.cpp BlockAir.cpp BlockDirt.cpp BlockGlowstoneLamp.cpp BlockGrass.cpp Blocks.cpp BlockStone.cpp BlockWater.cpp BoundingBox.cpp Camera.cpp Chunk.cpp DebugDrawer.cpp GraphicsManager.cpp Perlin.cpp Player.cpp simplexnoise.cpp vec.cpp World.cpp PhysicsObj.cpp Box.cpp Mesh.cpp Region.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 

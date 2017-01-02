@@ -3,7 +3,9 @@
 
 
 BlockGlowstoneLamp::BlockGlowstoneLamp() {
-	lightOutput = 16;
+	lightOutput[0] = 15;
+	lightOutput[1] = 0;
+	lightOutput[2] = 0;
 	textures[0].path = "textures/redstone_lamp_on.png";
 	textures[1].path = "textures/redstone_lamp_on.png";
 	textures[2].path = "textures/redstone_lamp_on.png";

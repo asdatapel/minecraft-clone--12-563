@@ -16,6 +16,7 @@
 #include "shaders.hpp"
 #include "Perlin.h"
 #include "Camera.h"
+#include "Mesh.h"
 
 
 int main() {
@@ -37,6 +38,8 @@ int main() {
     window.setMouseCursorVisible(false);
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -78,68 +81,16 @@ int main() {
     GLint matrixUniformSky = graphics.getUniform(shaderSky, "PVM");
     GLint sunlightUniformSky = graphics.getUniform(shaderSky, "sunlight");
 
-    float crosshairMesh[] = {
-            -0.01f, 0.01f, 0.0f, 1.0f,
-            0.01f, 0.01f, 1.0f, 1.0f,
-            -0.01f, -0.01f, 0.0f, 0.0f,
-            -0.01f, -0.01f, 0.0f, 0.0f,
-            0.01f, 0.01f, 1.0f, 1.0f,
-            0.01f, -0.01f, 1.0f, 0.0f,
-    };
+    Mesh crosshairMesh;
+    crosshairMesh.loadFromFile("models/crosshairSquare");
+
     int crosshairBuffer = graphics.newBuffer(shader2d);
-    graphics.updateBuffer(crosshairBuffer, crosshairMesh, 24);
+    graphics.updateBuffer(crosshairBuffer, crosshairMesh.vertices, crosshairMesh.vertexCount);
 
-    float skyMesh[180] = {
-            1.0f, -1.0f, -1.0f, 0.0, 1.0 / 3.0,
-            -1.0f, -1.0f, -1.0f, 1.0 / 4.0, 1.0 / 3.0,
-            1.0f, 1.0f, -1.0f, 0.0, 2.0 / 3.0,
-
-            -1.0f, -1.0f, -1.0f, 1.0 / 4.0, 1.0 / 3.0,
-            -1.0f, 1.0f, -1.0f, 1.0 / 4.0, 2.0 / 3.0,
-            1.0f, 1.0f, -1.0f, 0.0, 2.0 / 3.0,
-
-            1.0f, -1.0f, 1.0f, 3.0 / 4.0, 1.0 / 3.0,
-            -1.0f, 1.0f, 1.0f, 2.0 / 4.0, 2.0 / 3.0,
-            -1.0f, -1.0f, 1.0f, 2.0 / 4.0, 1.0 / 3.0,
-
-            1.0f, -1.0f, 1.0f, 3.0 / 4.0, 1.0 / 3.0,
-            1.0f, 1.0f, 1.0f, 3.0 / 4.0, 2.0 / 3.0,
-            -1.0f, 1.0f, 1.0f, 2.0 / 4.0, 2.0 / 3.0,
-
-            1.0f, 1.0f, 1.0f, 1.0 / 4.0, 2.0 / 3.0,
-            1.0f, -1.0f, -1.0f, 2.0 / 4.0, 1.0 / 3.0,
-            1.0f, 1.0f, -1.0f, 2.0 / 4.0, 2.0 / 3.0,
-
-            1.0f, 1.0f, 1.0f, 1.0 / 4.0, 2.0 / 3.0,
-            1.0f, -1.0f, 1.0f, 1.0 / 4.0, 1.0 / 3.0,
-            1.0f, -1.0f, -1.0f, (float) (2.0 / 4.0), (float) (1.0 / 3.0),
-
-            -1.0f, -1.0f, -1.0f, 3.0 / 4.0, 1.0 / 3.0,
-            -1.0f, 1.0f, 1.0f, 4.0 / 4.0, 2.0 / 3.0,
-            -1.0f, 1.0f, -1.0f, 3.0 / 4.0, 2.0 / 3.0,
-
-            -1.0f, -1.0f, -1.0f, (float) (3.0 / 4.0), 1.0 / 3.0,
-            -1.0f, -1.0f, 1.0f, 4.0 / 4.0, 1.0 / 3.0,
-            -1.0f, 1.0f, 1.0f, 4.0 / 4.0, 2.0 / 3.0,
-
-            -1.0f, -1.0f, -1.0f, 2.0 / 4.0, 1.0 / 3.0,
-            1.0f, -1.0f, 1.0f, 1.0 / 4.0, 0.0f,
-            -1.0f, -1.0f, 1.0f, 2.0 / 4.0, 0.0f,
-
-            -1.0f, -1.0f, -1.0f, 2.0 / 4.0, 1.0 / 3.0,
-            1.0f, -1.0f, -1.0f, 1.0 / 4.0, 1.0 / 3.0,
-            1.0f, -1.0f, 1.0f, 1.0 / 4.0, 0.0f,
-
-            -1.0f, 1.0f, 1.0f, 1.0 / 4.0, 2.0 / 3.0,
-            1.0f, 1.0f, -1.0f, 2.0 / 4.0, 1.0f,
-            -1.0f, 1.0f, -1.0f, 1.0 / 4.0, 1.0f,
-
-            -1.0f, 1.0f, 1.0f, 1.0 / 4.0, 2.0 / 3.0,
-            1.0f, 1.0f, 1.0f, 2.0 / 4.0, 2.0 / 3.0,
-            1.0f, 1.0f, -1.0f, 2.0 / 4.0, 1.0f,
-    };
+    Mesh skyMesh;
+    skyMesh.loadFromFile("models/skyCube");
     int skyBuffer = graphics.newBuffer(shaderSky);
-    graphics.updateBuffer(skyBuffer, skyMesh, 180);
+    graphics.updateBuffer(skyBuffer, skyMesh.vertices, skyMesh.vertexCount);
 
     //setup
     Player player;
@@ -155,7 +106,7 @@ int main() {
 
     fvec3 velocity(0, 0, 0);
 
-    float sunlight = 0.0f;
+    float sunlight = 0.035f;
     float sunlightTimer = 0.0f;
 
 
@@ -168,6 +119,7 @@ int main() {
     world->createBoxes(boxShader);
 
     sf::Clock timer;
+    int selectedBlock = 0;
 
     bool cameraControl = true;
     bool running = true;
@@ -194,9 +146,29 @@ int main() {
                     world->createRandomBoxes(boxShader);
                 } else if (event.key.code == sf::Keyboard::P) {
                     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                } else if (event.key.code == sf::Keyboard::O) {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                } else if (event.key.code == sf::Keyboard::Num0) {
+                    selectedBlock = 0;
+                } else if (event.key.code == sf::Keyboard::Num1) {
+                    selectedBlock = 1;
+                } else if (event.key.code == sf::Keyboard::Num2) {
+                    selectedBlock = 2;
+                } else if (event.key.code == sf::Keyboard::Num3) {
+                    selectedBlock = 3;
+                } else if (event.key.code == sf::Keyboard::Num4) {
+                    selectedBlock = 4;
+                } else if (event.key.code == sf::Keyboard::Num5) {
+                    selectedBlock = 5;
+                } else if (event.key.code == sf::Keyboard::Num6) {
+                    selectedBlock = 6;
+                } else if (event.key.code == sf::Keyboard::Num7) {
+                    selectedBlock = 7;
+                } else if (event.key.code == sf::Keyboard::Num8) {
+                    selectedBlock = 8;
+                } else if (event.key.code == sf::Keyboard::Num9) {
+                    selectedBlock = 9;
                 }
-            } else if (event.key.code == sf::Keyboard::O) {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             } else if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Button::Left) {
                     RayCollision ray = world->raycast(camera.getPosition(), camera.getDirectionVector(), 4);
@@ -213,13 +185,13 @@ int main() {
                     std::cout << ray.blockPos.x << "--" << ray.blockPos.z << "--" << ray.blockPos.y << "-----------"
                               << ray.side << "\n";
                     if (ray.isCollision && !player.checkCollision(floor(ray.blockPos + adjacent[ray.side])))
-                        world->addBlock(ray.blockPos + adjacent[ray.side], 4);
+                        world->addBlock(ray.blockPos + adjacent[ray.side], selectedBlock);
                 } else if (event.mouseButton.button == sf::Mouse::Button::Middle) {
                     RayCollision ray = world->raycast(camera.getPosition(), camera.getDirectionVector(), 4);
                     std::cout << ray.blockPos.x << "--" << ray.blockPos.z << "--" << ray.blockPos.y << "-----------"
                               << ray.side << "-----------" << world->getSunlightLevel(ray.blockPos) << "\n";
                     if (ray.isCollision && !player.checkCollision(floor(ray.blockPos + adjacent[ray.side])))
-                        world->addBlock(ray.blockPos + adjacent[ray.side], 1);
+                        world->addBlock(ray.blockPos + adjacent[ray.side], 6);
                 }
 
             }
@@ -309,20 +281,6 @@ int main() {
 
         glm::mat4 modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glDisable(GL_DEPTH_TEST);
-        graphics.bindShader(shaderSky);
-        graphics.bindTexture(skyTex);
-        glUniformMatrix4fv(matrixUniformSky, 1, GL_FALSE, glm::value_ptr(camera.getCenteredPVMat()));
-        graphics.renderBuffer(skyBuffer, 36);
-
-        glEnable(GL_DEPTH_TEST);
-        graphics.bindShader(shader3d);
-        graphics.bindArrayTexture();
-        glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(PV * modelMat));
-
         sunlightTimer += elapsedTime / 2;
         //sunlight = 0.03f + (0.03f * std::sin(sunlightTimer));
         //sunlight = 0.05;
@@ -339,9 +297,20 @@ int main() {
         if (sunlight < 0.0f)
             sunlight = 0.0f;
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glDisable(GL_DEPTH_TEST);
+        graphics.bindShader(shaderSky);
+        graphics.bindTexture(skyTex);
+        glUniformMatrix4fv(matrixUniformSky, 1, GL_FALSE, glm::value_ptr(camera.getCenteredPVMat()));
+        glUniform1f(sunlightUniformSky, sunlight);
+        graphics.renderBuffer(skyBuffer, 36);
+
+        glEnable(GL_DEPTH_TEST);
+        graphics.bindShader(shader3d);
+        graphics.bindArrayTexture();
+        glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(PV * modelMat));
         glUniform1f(sunlightUniform, sunlight);
-
         world->renderChunks();
 
         graphics.bindShader(boxShader);

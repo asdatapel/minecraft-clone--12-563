@@ -144,7 +144,7 @@ int GraphicsManager::getTexture(std::string name) {
     glGenTextures(1, &(tex.handle));
     glBindTexture(GL_TEXTURE_2D, tex.handle);
     glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGBA8,
+            GL_TEXTURE_2D, 0, GL_RGBA,
             tex.image.getSize().x, tex.image.getSize().y,
             0,
             GL_RGBA, GL_UNSIGNED_BYTE, tex.image.getPixelsPtr()

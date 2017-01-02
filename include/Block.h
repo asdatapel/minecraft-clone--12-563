@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "Types.h"
 class Block
 {
 public:
@@ -7,7 +8,7 @@ public:
 	~Block();
 	
 	int id;
-	int lightOutput;
+	LightLevel lightOutput[3];
 
 	bool isTransparent;
 

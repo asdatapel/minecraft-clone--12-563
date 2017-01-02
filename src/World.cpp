@@ -22,7 +22,9 @@ void World::genChunks(Perlin *p) {
     blocks[1].textures[3].texId = graphics->getArrayTexture("textures/stone.png");
     blocks[1].textures[4].texId = graphics->getArrayTexture("textures/stone.png");
     blocks[1].textures[5].texId = graphics->getArrayTexture("textures/stone.png");
-    blocks[1].lightOutput = 0;
+    blocks[1].lightOutput[0] = 0;
+    blocks[1].lightOutput[1] = 15;
+    blocks[1].lightOutput[2] = 0;
     blocks[2].id = 2;
     blocks[2].textures[0].texId = graphics->getArrayTexture("textures/dirt.png");
     blocks[2].textures[1].texId = graphics->getArrayTexture("textures/dirt.png");
@@ -30,7 +32,9 @@ void World::genChunks(Perlin *p) {
     blocks[2].textures[3].texId = graphics->getArrayTexture("textures/dirt.png");
     blocks[2].textures[4].texId = graphics->getArrayTexture("textures/dirt.png");
     blocks[2].textures[5].texId = graphics->getArrayTexture("textures/dirt.png");
-    blocks[2].lightOutput = 0;
+    blocks[2].lightOutput[0] = 0;
+    blocks[2].lightOutput[1] = 0;
+    blocks[2].lightOutput[2] = 0;
     blocks[3].id = 3;
     blocks[3].textures[0].texId = graphics->getArrayTexture("textures/grass_side.png");
     blocks[3].textures[1].texId = graphics->getArrayTexture("textures/grass_side.png");
@@ -38,15 +42,69 @@ void World::genChunks(Perlin *p) {
     blocks[3].textures[3].texId = graphics->getArrayTexture("textures/grass_side.png");
     blocks[3].textures[4].texId = graphics->getArrayTexture("textures/dirt.png");
     blocks[3].textures[5].texId = graphics->getArrayTexture("textures/grass.png");
-    blocks[3].lightOutput = 2;
+    blocks[3].lightOutput[0] = 0;
+    blocks[3].lightOutput[1] = 0;
+    blocks[3].lightOutput[2] = 0;
     blocks[4].id = 4;
-    blocks[4].lightOutput = 5;
+    blocks[4].lightOutput[0] = 15;
+    blocks[4].lightOutput[1] = 0;
+    blocks[4].lightOutput[2] = 0;
     blocks[4].textures[0].texId = graphics->getArrayTexture("textures/redstone_lamp_on.png");
     blocks[4].textures[1].texId = graphics->getArrayTexture("textures/redstone_lamp_on.png");
     blocks[4].textures[2].texId = graphics->getArrayTexture("textures/redstone_lamp_on.png");
     blocks[4].textures[3].texId = graphics->getArrayTexture("textures/redstone_lamp_on.png");
     blocks[4].textures[4].texId = graphics->getArrayTexture("textures/redstone_lamp_on.png");
     blocks[4].textures[5].texId = graphics->getArrayTexture("textures/redstone_lamp_on.png");
+    blocks[5].id = 5;
+    blocks[5].lightOutput[0] = 15;
+    blocks[5].lightOutput[1] = 0;
+    blocks[5].lightOutput[2] = 0;
+    blocks[5].textures[0].texId = graphics->getArrayTexture("textures/red.png");
+    blocks[5].textures[1].texId = graphics->getArrayTexture("textures/red.png");
+    blocks[5].textures[2].texId = graphics->getArrayTexture("textures/red.png");
+    blocks[5].textures[3].texId = graphics->getArrayTexture("textures/red.png");
+    blocks[5].textures[4].texId = graphics->getArrayTexture("textures/red.png");
+    blocks[5].textures[5].texId = graphics->getArrayTexture("textures/red.png");
+    blocks[6].id = 6;
+    blocks[6].lightOutput[0] = 0;
+    blocks[6].lightOutput[1] = 15;
+    blocks[6].lightOutput[2] = 0;
+    blocks[6].textures[0].texId = graphics->getArrayTexture("textures/green.png");
+    blocks[6].textures[1].texId = graphics->getArrayTexture("textures/green.png");
+    blocks[6].textures[2].texId = graphics->getArrayTexture("textures/green.png");
+    blocks[6].textures[3].texId = graphics->getArrayTexture("textures/green.png");
+    blocks[6].textures[4].texId = graphics->getArrayTexture("textures/green.png");
+    blocks[6].textures[5].texId = graphics->getArrayTexture("textures/green.png");
+    blocks[7].id = 7;
+    blocks[7].lightOutput[0] = 0;
+    blocks[7].lightOutput[1] = 0;
+    blocks[7].lightOutput[2] = 15;
+    blocks[7].textures[0].texId = graphics->getArrayTexture("textures/blue.png");
+    blocks[7].textures[1].texId = graphics->getArrayTexture("textures/blue.png");
+    blocks[7].textures[2].texId = graphics->getArrayTexture("textures/blue.png");
+    blocks[7].textures[3].texId = graphics->getArrayTexture("textures/blue.png");
+    blocks[7].textures[4].texId = graphics->getArrayTexture("textures/blue.png");
+    blocks[7].textures[5].texId = graphics->getArrayTexture("textures/blue.png");
+    blocks[8].id = 8;
+    blocks[8].lightOutput[0] = 0;
+    blocks[8].lightOutput[1] = 0;
+    blocks[8].lightOutput[2] = 0;
+    blocks[8].textures[0].texId = graphics->getArrayTexture("textures/white.png");
+    blocks[8].textures[1].texId = graphics->getArrayTexture("textures/white.png");
+    blocks[8].textures[2].texId = graphics->getArrayTexture("textures/white.png");
+    blocks[8].textures[3].texId = graphics->getArrayTexture("textures/white.png");
+    blocks[8].textures[4].texId = graphics->getArrayTexture("textures/white.png");
+    blocks[8].textures[5].texId = graphics->getArrayTexture("textures/white.png");
+    blocks[9].id = 9;
+    blocks[9].lightOutput[0] = 0;
+    blocks[9].lightOutput[1] = 0;
+    blocks[9].lightOutput[2] = 0;
+    blocks[9].textures[0].texId = graphics->getArrayTexture("textures/log_birch.png");
+    blocks[9].textures[1].texId = graphics->getArrayTexture("textures/log_birch.png");
+    blocks[9].textures[2].texId = graphics->getArrayTexture("textures/log_birch.png");
+    blocks[9].textures[3].texId = graphics->getArrayTexture("textures/log_birch.png");
+    blocks[9].textures[4].texId = graphics->getArrayTexture("textures/log_birch_top.png");
+    blocks[9].textures[5].texId = graphics->getArrayTexture("textures/log_birch_top.png");
 
     perlin = p;
 
@@ -141,7 +199,10 @@ int World::getBlock(fvec3 position) {
 void World::removeBlock(fvec3 position) {
     if (getBlock(position) != 0) {
         setBlock(position, 0);
-        removeLight(position);
+        removeLight(position, 0);
+        removeLight(position, 1);
+        removeLight(position, 2);
+        removeSunlight(position);
     }
 }
 
@@ -149,10 +210,22 @@ void World::addBlock(fvec3 position, int blockId) {
     position = floor(position);
     if (getBlock(position) == 0) {
         setBlock(position, blockId);
-        if (blocks[blockId].lightOutput > 0)
-            addLight(position, blocks[blockId].lightOutput);
-        else
-            removeLight(position);
+        if (blocks[blockId].lightOutput[0] > 0) {//check for all channels
+            addLight(position, blocks[blockId].lightOutput[0], 0);
+        } else {
+            removeLight(position, 0);
+        }
+        if (blocks[blockId].lightOutput[1] > 1) {//check for all channels
+            addLight(position, blocks[blockId].lightOutput[1], 1);
+        } else {
+            removeLight(position, 1);
+        }
+        if (blocks[blockId].lightOutput[2] > 2) {//check for all channels
+            addLight(position, blocks[blockId].lightOutput[2], 2);
+        } else {
+            removeLight(position, 2);
+        }
+        removeSunlight(position);
     }
 }
 
@@ -163,7 +236,7 @@ void World::setLightLevel(fvec3 position, unsigned short lightLevel) {
     if (!chunk)
         return;
 
-    chunk->setLightLevel(position, lightLevel);
+    chunk->setLightLevel(position, lightLevel, 0);
 }
 
 LightLevel World::getLightLevel(fvec3 position) {
@@ -173,7 +246,7 @@ LightLevel World::getLightLevel(fvec3 position) {
     if (!chunk)
         return -1;
 
-    return chunk->getLightLevel(position);
+    return chunk->getLightLevel(position, 0);
 }
 
 void World::setSunlightLevel(fvec3 position, unsigned short lightLevel) {
@@ -236,56 +309,9 @@ void World::setBlock(fvec3 position, int blockId) {
     }
 }
 
-#define VISIBLE_CHUNKS 10
+#define VISIBLE_CHUNKS 20
 
 void World::update(fvec3 playerPos, float elapsedTime) {
-
-    //move to own function later
-    /*while (!updateQueue.empty()){
-        fvec3 pos = updateQueue.front();
-        updateQueue.pop();
-
-        if (getBlock(pos) > -1) {
-            unsigned short light = getLightLevel(pos);
-            unsigned short sunlight = getSunlightLevel(pos);
-            unsigned short adj_light[6];
-            unsigned short adj_sunlight[6];
-            int max_light = 0;
-            int max_sunlight = 0;
-            for (int i = 0; i < 6; ++i) {
-                adj_light[i] = getLightLevel(pos + adjacent[i]);
-                adj_sunlight[i] = getSunlightLevel(pos + adjacent[i]);
-                if (adj_light[i] > adj_light[max_light])
-                    max_light = i;
-                if (adj_sunlight[i] > adj_sunlight[max_sunlight])
-                    max_sunlight = i;
-            }
-
-            if (adj_light[max_light] > light + 1) {
-                setLightLevel(pos, adj_light[max_light] - 1);
-                for (int i = 0; i < 6; ++i) {
-                    if (getBlock(pos + adjacent[i]) == 0)
-                        updateQueue.push(pos + adjacent[i]);
-                }
-            }
-
-            if (max_sunlight == 4 && adj_sunlight[max_sunlight] > sunlight) {
-                setSunlightLevel(pos, adj_sunlight[max_sunlight]);
-                for (int i = 0; i < 6; ++i) {
-                    if (getBlock(pos + adjacent[i]) == 0)
-                        updateQueue.push(pos + adjacent[i]);
-                }
-            } else if (adj_sunlight[max_sunlight] > sunlight + 1) {
-                setSunlightLevel(pos, adj_sunlight[max_sunlight] - 1);
-                for (int i = 0; i < 6; ++i) {
-                    if (getBlock(pos + adjacent[i]) == 0)
-                        updateQueue.push(pos + adjacent[i]);
-                }
-            }
-        }
-
-    }*/
-
     std::unique_lock<std::mutex> lock(m);
 
     ivec2 centerChunk = getChunkCoords(playerPos);
@@ -415,7 +441,8 @@ ivec2 World::getChunkCoords(ivec2 worldPosition) {
 }
 
 bool World::isChunkInLoadRange(ivec2 chunkCoords, ivec2 playerCoords) {
-    return pow(chunkCoords.x - playerCoords.x, 2) + pow(chunkCoords.z - playerCoords.z, 2) < pow(VISIBLE_CHUNKS, 2);
+    //return pow(chunkCoords.x - playerCoords.x, 2) + pow(chunkCoords.z - playerCoords.z, 2) < pow(VISIBLE_CHUNKS, 2);
+    return pow(chunkCoords.x, 2) + pow(chunkCoords.z, 2) < pow(VISIBLE_CHUNKS, 2);
 }
 
 bool World::isChunkInMeshRange(ivec2 chunkCoords, ivec2 playerCoords) {
@@ -443,17 +470,24 @@ bool World::isChunkNeighborsLoaded(ivec2 chunkCoords) {
     return true;
 }
 
-void World::addLight(fvec3 position, LightLevel lightLevel) {
+void World::addLight(fvec3 position, LightLevel lightLevel, int channel) {
     Chunk *chunk = getChunk(getChunkCoords(position));
     if (chunk) {
-        chunk->addLight(position, lightLevel);
+        chunk->addLight(position, lightLevel, channel);
     }
 }
 
-void World::removeLight(fvec3 position) {
+void World::removeLight(fvec3 position, int channel) {
     Chunk *chunk = getChunk(getChunkCoords(position));
     if (chunk) {
-        chunk->removeLight(position);
+        chunk->removeLight(position, channel);
+    }
+}
+
+void World::removeSunlight(fvec3 position) {
+    Chunk *chunk = getChunk(getChunkCoords(position));
+    if (chunk) {
+        chunk->removeSunlight(position);
     }
 }
 
@@ -462,17 +496,17 @@ void World::addCompleteJobToQueue(std::queue<Chunk *> *q, Chunk *job) {
     q->push(job);
 }
 
-Chunk* World::getNextJob(std::list<Chunk*>* jobs){
-    std::list<Chunk*>::iterator max_i;
+Chunk *World::getNextJob(std::list<Chunk *> *jobs) {
+    std::list<Chunk *>::iterator max_i;
     int min = 3000;
-    for (std::list<Chunk*>::iterator i = jobs->begin(); i != jobs->end(); ++i){
+    for (std::list<Chunk *>::iterator i = jobs->begin(); i != jobs->end(); ++i) {
         int d = std::abs((*i)->chunkCoords.x - chunkLoadCenter.x) + std::abs((*i)->chunkCoords.z - chunkLoadCenter.z);
         if (d < min) {
             min = d;
             max_i = i;
         }
     }
-    Chunk* job = *max_i;
+    Chunk *job = *max_i;
     jobs->erase(max_i);
     return job;
 }
@@ -575,63 +609,109 @@ void World::createRandomBoxes(int shaderId) {
 void World::genChunk(Chunk *chunk) {
     Block1 *data = chunk->data;
     ivec2 chunkCoords = chunk->chunkCoords;
-    Perlin p2(6, 4, 1, 50);
-    Perlin p3(1, 1, 2, 59);
 
     fvec3 coords;
     for (coords.x = 0; coords.x < CHUNK_SIZE_X; coords.x++) {
         for (coords.z = 0; coords.z < CHUNK_SIZE_Z; coords.z++) {
-            /*int stoneHeight = (int) (60 + 9 * perlin->Get((coords.x + chunkCoords.x * CHUNK_SIZE_X) * 0.003f,
-                                                          (coords.z + chunkCoords.z * CHUNK_SIZE_Z) * 0.003f) +
-                                     50 * p2.Get((coords.x +
-                                                  chunkCoords.x *
-                                                  CHUNK_SIZE_X) *
-                                                 0.0003f,
-                                                 (coords.z +
-                                                  chunkCoords.z *
-                                                  CHUNK_SIZE_Z) *
-                                                 0.0003f));*/
-            int stoneHeight = 60;
-            for (coords.y = 0; coords.y < stoneHeight; coords.y++) {
+
+            int dirtHeight =
+                    (int) (15 * octave_noise_3d(4, 1, 1, (coords.x + chunkCoords.x * CHUNK_SIZE_X) * 0.003f,
+                                                (coords.z + chunkCoords.z * CHUNK_SIZE_Z) * 0.003f, 20)) +
+                    (int) (50 + 30 * octave_noise_3d(4, 2, 0.5, (coords.x + chunkCoords.x * CHUNK_SIZE_X) * 0.0009f,
+                                                     (coords.z + chunkCoords.z * CHUNK_SIZE_Z) * 0.0009f, 3645));
+            for (coords.y = 0; coords.y < dirtHeight; ++coords.y) {
                 data[flattenVector(coords)].blockId = 2;
-            }
-            /*int caveHeight = (int) std::max(10 * p3.Get((coords.x + chunkCoords.x * CHUNK_SIZE_X) * 0.03f,
-            (coords.z + chunkCoords.z * CHUNK_SIZE_Z) * 0.03f), 0.0f);*/
-            int caveHeight = 0;
-            if (chunkCoords.z % 2 == 0)
-                caveHeight = 16 - coords.x;
-            for (coords.y = stoneHeight; coords.y < stoneHeight + caveHeight; coords.y++) {
-                data[flattenVector(coords)].blockId = 0;
                 data[flattenVector(coords)].sunlightLevel = 0;
+                data[flattenVector(coords)].lightLevel[0] = 0;
+                data[flattenVector(coords)].lightLevel[1] = 0;
+                data[flattenVector(coords)].lightLevel[2] = 0;
             }
 
-            /*int dirtHeight = (int) (10 + 5 * perlin->Get((coords.x + chunkCoords.x * CHUNK_SIZE_X) * 0.003f,
-                                                         (coords.z + chunkCoords.z * CHUNK_SIZE_Z) * 0.003f));*/
-            int dirtHeight = 0;
-            for (coords.y = stoneHeight + caveHeight; coords.y < stoneHeight + dirtHeight; coords.y++) {
-                data[flattenVector(coords)].blockId = 2;
-                data[flattenVector(coords)].lightLevel = 0;
-                data[flattenVector(coords)].sunlightLevel = 0;
-            }
-            data[flattenVector({coords.x, coords.z, (float) dirtHeight + stoneHeight + caveHeight})].blockId = 3;
-            for (coords.y = dirtHeight + stoneHeight + caveHeight + 1; coords.y < CHUNK_SIZE_Y; coords.y++) {
+            coords.y = dirtHeight;
+            data[flattenVector(coords)].blockId = 3;
+            data[flattenVector(coords)].sunlightLevel = 0;
+            data[flattenVector(coords)].lightLevel[0] = 0;
+            data[flattenVector(coords)].lightLevel[1] = 0;
+            data[flattenVector(coords)].lightLevel[2] = 0;
+
+            for (coords.y = dirtHeight + 1; coords.y < CHUNK_SIZE_Y; ++coords.y) {
                 data[flattenVector(coords)].blockId = 0;
-                data[flattenVector(coords)].lightLevel = 0;
                 data[flattenVector(coords)].sunlightLevel = 0;
+                data[flattenVector(coords)].lightLevel[0] = 0;
+                data[flattenVector(coords)].lightLevel[1] = 0;
+                data[flattenVector(coords)].lightLevel[2] = 0;
             }
-            /*if (((int) coords.x % 16 > 6 && (int) coords.x % 16 < 10) ||
-                ((int) coords.z % 16 < 3 || (int) coords.z % 16 > 13))
-                data[flattenVector({coords.x, coords.z, (float) dirtHeight + stoneHeight + 5})].blockId = 3;*/
+
+            for (coords.y = 0; coords.y < CHUNK_SIZE_Y; coords.y++) {
+                fvec3 worldCoords = {chunkCoords.x * CHUNK_SIZE_X + coords.x,
+                                     chunkCoords.z * CHUNK_SIZE_Z + coords.z, coords.y};
+                float val1 = octave_noise_3d(1, 0.6, 1.2, worldCoords.x / 75.f, worldCoords.z / 75.f,
+                                             worldCoords.y / 45.f) * (1.5f - worldCoords.y / 256.0f);
+                float val2 = octave_noise_3d(2, 0.6, 1.2, worldCoords.x / 75.f, worldCoords.z / 75.f,
+                                             worldCoords.y / 85.f) * (1.5f - worldCoords.y / 256.0f);
+
+                if (val1 <= 0.1 && val1 >= -0.11 && val2 <= 0.1 && val2 >= -0.1) {
+
+                    data[flattenVector(coords)].blockId = 0;
+                    data[flattenVector(coords)].sunlightLevel = 0;
+                    data[flattenVector(coords)].lightLevel[0] = 0;
+                    data[flattenVector(coords)].lightLevel[1] = 0;
+                    data[flattenVector(coords)].lightLevel[2] = 0;
+                }
+            }
+
+            float noise = (octave_noise_3d(4, 1, 1, (coords.x + chunkCoords.x * CHUNK_SIZE_X) * 0.09f,
+                                           (coords.z + chunkCoords.z * CHUNK_SIZE_Z) * 0.09f, 20) + 1) / 2;
+            float rand = std::rand() / (float) RAND_MAX;
+            if (rand >= 0.5 && rand <= noise) {
+                coords.y = CHUNK_SIZE_Y - 1;
+                while (coords.y >= 0 && data[flattenVector(coords)].blockId == 0) {
+                    --coords.y;
+                }
+                for (int i = coords.y + 1; i < coords.y + 6 && i < CHUNK_SIZE_Y; ++i) {
+                    data[flattenVector(fvec3(coords.x, coords.z, (float) i))].blockId = 9;
+                }
+            }
+
+            /*for (coords.y = 0; coords.y < 40; ++coords.y){
+                data[flattenVector(coords)].blockId = 1;
+                data[flattenVector(coords)].sunlightLevel = 0;
+                data[flattenVector(coords)].lightLevel[0] = 0;
+                data[flattenVector(coords)].lightLevel[1] = 0;
+                data[flattenVector(coords)].lightLevel[2] = 0;
+
+            }
+            for (coords.y = 40; coords.y < 60; ++coords.y){
+                data[flattenVector(coords)].blockId = 0;
+                data[flattenVector(coords)].sunlightLevel = 0;
+                data[flattenVector(coords)].lightLevel[0] = 0;
+                data[flattenVector(coords)].lightLevel[1] = 0;
+                data[flattenVector(coords)].lightLevel[2] = 0;
+            }
+            for (coords.y = 60; coords.y < 80; ++coords.y){
+                data[flattenVector(coords)].blockId = 1;
+                data[flattenVector(coords)].sunlightLevel = 0;
+                data[flattenVector(coords)].lightLevel[0] = 0;
+                data[flattenVector(coords)].lightLevel[1] = 0;
+                data[flattenVector(coords)].lightLevel[2] = 0;
+            }
+            for (coords.y = 80; coords.y < 256; ++coords.y){
+                data[flattenVector(coords)].blockId = 0;
+                data[flattenVector(coords)].sunlightLevel = 0;
+                data[flattenVector(coords)].lightLevel[0] = 0;
+                data[flattenVector(coords)].lightLevel[1] = 0;
+                data[flattenVector(coords)].lightLevel[2] = 0;
+            }*/
+
         }
     }
-
 
     for (int i = chunkCoords.x * CHUNK_SIZE_X; i < chunkCoords.x * CHUNK_SIZE_X + CHUNK_SIZE_X; ++i) {
         for (int j = chunkCoords.z * CHUNK_SIZE_Z; j < chunkCoords.z * CHUNK_SIZE_Z + CHUNK_SIZE_Z; ++j) {
             chunk->addSunlightLocal({i, j, CHUNK_SIZE_Y - 1}, 10);
-            //std::cout << i << " --- " << j << "\n";
         }
     }
+
 }
 
 int World::flattenVector(fvec3 coords) {
